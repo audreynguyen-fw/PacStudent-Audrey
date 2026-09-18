@@ -19061,7 +19061,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c70a0b7b741f7be489dac65fcaadc22f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PacStudentMovement
-  speed: 3
+  speed: 1
   animator: {fileID: 911720572}
   audioSource: {fileID: 911720576}
   moveSound: {fileID: 8300000, guid: 72c985e404ed65149bd13ceef1bdb726, type: 3}
