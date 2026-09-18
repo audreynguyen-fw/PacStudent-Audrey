@@ -62,12 +62,10 @@ public class LevelGenerator : MonoBehaviour
             {
                 int val = levelMap[r, c];
                 if (val == 0) continue;
-
-                // 1. Top-Left (Quadrant gốc)
+                
                 float rotTL = CalculateRotation(r, c, val);
                 SpawnTile(val, new Vector3(c, -r, 0), Quaternion.Euler(0, 0, rotTL), qTopLeft);
-
-                // 2. Top-Right (Lật đối xứng qua trục X)
+                
                 float rotTR = GetMirroredRotationX(val, rotTL);
                 SpawnTile(val, new Vector3(-c, -r, 0), Quaternion.Euler(0, 0, rotTR), qTopRight);
 
@@ -217,10 +215,10 @@ public class LevelGenerator : MonoBehaviour
         if (val == 2 || val == 4) return (rot == 0f) ? 0f : 90f;
         if (val == 1 || val == 3)
         {
-            if (rot == 0f) return 180f;   // ┌ -> ┘
-            if (rot == 90f) return 270f;  // └ -> ┐
-            if (rot == 180f) return 0f;   // ┘ -> ┌
-            if (rot == 270f) return 90f;  // ┐ -> └
+            if (rot == 0f) return 180f; 
+            if (rot == 90f) return 270f;
+            if (rot == 180f) return 0f;
+            if (rot == 270f) return 90f;
         }
         if (val == 7)
         {

@@ -11545,7 +11545,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5, y: -15, z: -10}
+  m_LocalPosition: {x: 10, y: -15, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -13851,7 +13851,7 @@ Transform:
   m_GameObject: {fileID: 619394800}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -2, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -19061,7 +19061,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c70a0b7b741f7be489dac65fcaadc22f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PacStudentMovement
-  speed: 1
+  speed: 3
   animator: {fileID: 911720572}
   audioSource: {fileID: 911720576}
   moveSound: {fileID: 8300000, guid: 72c985e404ed65149bd13ceef1bdb726, type: 3}
@@ -42455,7 +42455,7 @@ Transform:
   m_GameObject: {fileID: 2090491964}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -2, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -43343,7 +43343,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5582914960407857337, guid: d2b7028e3e8369b4eaabbe27ecc1b0bb, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -2
       objectReference: {fileID: 0}
     - target: {fileID: 5582914960407857337, guid: d2b7028e3e8369b4eaabbe27ecc1b0bb, type: 3}
       propertyPath: m_LocalPosition.y

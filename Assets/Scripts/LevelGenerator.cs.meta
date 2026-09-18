@@ -1,2 +1,20 @@
 fileFormatVersion: 2
 guid: 4a00e727db47a8d4e9a032d95c126a18
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - Corner_Outside: {instanceID: 0}
+  - Wall_Outside: {instanceID: 0}
+  - Corner_Inside: {instanceID: 0}
+  - Wall_Inside: {instanceID: 0}
+  - Pellet_Normal: {instanceID: 0}
+  - Pellet_Power_0: {instanceID: 0}
+  - TJunction: {instanceID: 0}
+  - Wall_GhostExit: {instanceID: 0}
+  - manualLevelParent: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
