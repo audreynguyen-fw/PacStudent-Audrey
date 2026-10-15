@@ -15,12 +15,16 @@ public class PacStudentController : MonoBehaviour
 
     private KeyCode lastInput = KeyCode.None;
     private KeyCode currentInput = KeyCode.None;
-    private Vector2 currentDirection = Vector2.zero;
+    private Vector2 currentDirection = Vector2.right;
 
     void Start()
     {
-        UpdateDirectionAnimation(Vector3.right);
-        
+        if (levelGenerator == null)
+            Debug.LogWarning("PacStudentController: LevelGenerator is not assigned in the Inspector!");
+
+        if (tweener == null)
+            Debug.LogWarning("PacStudentController: Tweener is not assigned in the Inspector!");
+
         if (animator != null) animator.speed = 0f;
         if (dustParticle != null) dustParticle.Stop();
     }
