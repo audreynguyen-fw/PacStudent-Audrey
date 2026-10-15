@@ -189,7 +189,6 @@ public class LevelGenerator : MonoBehaviour
     
     float GetMirroredRotationY(int val, float rot)
     {
-        float normalizedRot = Mathf.Repeat(rot, 360f);
         if (val == 2 || val == 4) return (rot == 0f) ? 0f : 90f;
         if (val == 1 || val == 3)
         {
@@ -209,8 +208,7 @@ public class LevelGenerator : MonoBehaviour
     
     float GetMirroredRotationXY(int val, float rot)
     {
-        float normalizedRot = Mathf.Repeat(rot, 360f);
-        int r = Mathf.RoundToInt(normalizedRot);
+        int r = Mathf.RoundToInt(Mathf.Repeat(rot, 360f));
         
         if (val == 2 || val == 4) return (rot == 0f) ? 0f : 90f;
         if (val == 1 || val == 3)
