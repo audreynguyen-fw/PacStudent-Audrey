@@ -6,21 +6,34 @@ public class CherryController : MonoBehaviour
     [Header("Cherry Settings")]
     public GameObject cherryPrefab;
     public Tweener tweener;
-    public float flyDuration = 5.0f;
+    public float flyDuration = 6.0f;
     public float spawnInterval = 5.0f;
 
-    private Vector3 mapCenter = Vector3.zero;
+    private Vector3 mapCenter = new Vector3(13.5f, -14.0f, 0f);
+    private GameObject currentCherry = null;
 
     void Start()
     {
+        if (cherryPrefab == null)
+            Debug.LogWarning("CherryController: Missing Cherry Prefab reference!");
+        if (tweener == null)
+            Debug.LogWarning("CherryController: Missing Tweener reference!");
+
         StartCoroutine(SpawnCherryRoutine());
     }
+
     private IEnumerator SpawnCherryRoutine()
     {
         while (true)
         {
             yield return new WaitForSeconds(spawnInterval);
+
             SpawnAndMoveCherry();
+
+            while (currentCherry != null)
+            {
+                yield return null;
+            }
         }
     }
 
@@ -28,17 +41,43 @@ public class CherryController : MonoBehaviour
     {
         if (cherryPrefab == null || tweener == null) return;
 
-        float spawnRadius = 15.0f;
-        float randomAngle = Random.Range(0f, 360f) * Mathf.Deg2Rad;
+        float halfWidth = 16.0f;
+        float halfHeight = 16.0f;
 
-        Vector3 spawnPos = mapCenter + new Vector3(Mathf.Cos(randomAngle) * spawnRadius, Mathf.Sin(randomAngle) * spawnRadius, 0f);
+        int side = Random.Range(0, 4);
+        Vector3 spawnPos = Vector3.zero;
+
+        switch (side)
+        {
+            case 0:
+                spawnPos = mapCenter + new Vector3(-halfWidth, Random.Range(-halfHeight, halfHeight), 0f);
+                break;
+            case 1:
+                spawnPos = mapCenter + new Vector3(halfWidth, Random.Range(-halfHeight, halfHeight), 0f);
+                break;
+            case 2:
+                spawnPos = mapCenter + new Vector3(Random.Range(-halfWidth, halfWidth), halfHeight, 0f);
+                break;
+            case 3:
+                spawnPos = mapCenter + new Vector3(Random.Range(-halfWidth, halfWidth), -halfHeight, 0f);
+                break;
+        }
+
         Vector3 targetPos = mapCenter - (spawnPos - mapCenter);
 
-        GameObject cherryObj = Instantiate(cherryPrefab, spawnPos, Quaternion.identity);
+        currentCherry = Instantiate(cherryPrefab, spawnPos, Quaternion.identity);
 
-        tweener.AddTween(cherryObj.transform, spawnPos, targetPos, flyDuration);
-        StartCoroutine(DestroyCherryAfterDuration(cherryObj, flyDuration));
+        SpriteRenderer sr = currentCherry.GetComponent<SpriteRenderer>();
+        if (sr != null)
+        {
+            sr.sortingOrder = 30;
+            sr.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
+        }
+
+        tweener.AddTween(currentCherry.transform, spawnPos, targetPos, flyDuration);
+        StartCoroutine(DestroyCherryAfterDuration(currentCherry, flyDuration));
     }
+
     private IEnumerator DestroyCherryAfterDuration(GameObject cherry, float duration)
     {
         yield return new WaitForSeconds(duration);
