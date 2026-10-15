@@ -3,22 +3,24 @@ using UnityEngine;
 public class PacStudentController : MonoBehaviour
 {
     [Header("Movement Settings")]
-    [Tooltip("Time taken to move across 1 tile in seconds. 0.2s equals 5 tiles per second.")]
     public float timePerTile = 0.2f;
 
     [Header("References")]
     public Tweener tweener;
+    public LevelGenerator levelGenerator;
     public Animator animator;
     public AudioSource audioSource;
     public AudioClip moveSound;
-    public AudioClip eatPelletSound;
     public ParticleSystem dustParticle;
+
     private KeyCode lastInput = KeyCode.None;
     private KeyCode currentInput = KeyCode.None;
+    private Vector2 currentDirection = Vector2.zero;
 
     void Start()
     {
         UpdateDirectionAnimation(Vector3.right);
+        
         if (animator != null) animator.speed = 0f;
         if (dustParticle != null) dustParticle.Stop();
     }
@@ -34,6 +36,7 @@ public class PacStudentController : MonoBehaviour
             TryMoveInDirection();
         }
     }
+
     private void GatherInput()
     {
         if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) lastInput = KeyCode.W;
@@ -41,9 +44,11 @@ public class PacStudentController : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) lastInput = KeyCode.A;
         else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) lastInput = KeyCode.D;
     }
+
     private void TryMoveInDirection()
     {
         Vector2 lastDir = KeyToVector(lastInput);
+
         if (lastDir != Vector2.zero && IsWalkable(lastDir))
         {
             currentInput = lastInput;
@@ -66,6 +71,7 @@ public class PacStudentController : MonoBehaviour
             StopEffects();
         }
     }
+
     private void ExecuteTweenMove(Vector2 dir)
     {
         Vector3 startPos = transform.position;
@@ -76,13 +82,18 @@ public class PacStudentController : MonoBehaviour
             tweener.AddTween(transform, startPos, endPos, timePerTile);
         }
 
-        UpdateDirectionAnimation(dir);
+        if (dir != currentDirection)
+        {
+            UpdateDirectionAnimation(dir);
+            currentDirection = dir;
+        }
+
         if (animator != null) animator.speed = 1f;
 
         if (dustParticle != null && !dustParticle.isPlaying)
             dustParticle.Play();
 
-        PlayMovementAudio(dir);
+        PlayMovementAudio();
     }
 
     private void StopEffects()
@@ -103,53 +114,31 @@ public class PacStudentController : MonoBehaviour
             default: return Vector2.zero;
         }
     }
+
     private void UpdateDirectionAnimation(Vector3 dir)
     {
         if (animator == null) return;
 
-        if (dir.x > 0.5f)
-        {
-            animator.SetTrigger("MoveRight");
-        }
-        else if (dir.x < -0.5f)
-        {
-            animator.SetTrigger("MoveLeft");
-        }
-        else if (dir.y > 0.5f)
-        {
-            animator.SetTrigger("MoveUp");
-        }
-        else if (dir.y < -0.5f)
-        {
-            animator.SetTrigger("MoveDown");
-        }
+        if (dir.x > 0.5f) animator.SetTrigger("MoveRight");
+        else if (dir.x < -0.5f) animator.SetTrigger("MoveLeft");
+        else if (dir.y > 0.5f) animator.SetTrigger("MoveUp");
+        else if (dir.y < -0.5f) animator.SetTrigger("MoveDown");
     }
 
     private bool IsWalkable(Vector2 dir)
     {
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, dir, 1.0f);
-        if (hit.collider != null)
-        {
-            if (hit.collider.CompareTag("Wall") || hit.collider.CompareTag("GhostWall"))
-            {
-                return false;
-            }
-        }
-        return true;
+        if (levelGenerator == null) return false;
+        Vector3 nextTargetPos = transform.position + new Vector3(dir.x, dir.y, 0f);
+        return levelGenerator.IsWalkableGrid(nextTargetPos);
     }
 
-    private void PlayMovementAudio(Vector2 dir)
+    private void PlayMovementAudio()
     {
-        if (audioSource == null) return;
+        if (audioSource == null || moveSound == null) return;
 
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, dir, 1.0f);
-        bool nextIsPellet = (hit.collider != null && hit.collider.CompareTag("Pellet"));
-
-        AudioClip clipToPlay = nextIsPellet ? eatPelletSound : moveSound;
-
-        if (clipToPlay != null && (!audioSource.isPlaying || audioSource.clip != clipToPlay))
+        if (!audioSource.isPlaying)
         {
-            audioSource.clip = clipToPlay;
+            audioSource.clip = moveSound;
             audioSource.loop = true;
             audioSource.Play();
         }
