@@ -12,6 +12,9 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
+    [Header("UI Reference")]
+    public UIManager uiManager;
+
     [Header("Game State")]
     public GameState currentState { get; private set; } = GameState.InGame;
     public int currentScore { get; private set; } = 0;
@@ -33,6 +36,18 @@ public class GameManager : MonoBehaviour
         Instance = this;
     }
 
+    private void Start()
+    {
+        if (uiManager == null)
+        {
+            Debug.LogWarning("GameManager: UIManager reference is missing in the Inspector!");
+        }
+        else
+        {
+            uiManager.UpdateScoreUI(currentScore);
+        }
+    }
+
     public void SetTotalPellets(int count)
     {
         totalPelletsRemaining = count;
@@ -43,10 +58,8 @@ public class GameManager : MonoBehaviour
     {
         if (currentState != GameState.InGame) return;
 
-        currentScore += ScoreNormalPellet;
+        AddScore(ScoreNormalPellet);
         totalPelletsRemaining--;
-
-        Debug.Log("Normal Pellet Eaten. Score: " + currentScore + " | Pellets Left: " + totalPelletsRemaining);
 
         CheckLevelComplete();
     }
@@ -55,10 +68,8 @@ public class GameManager : MonoBehaviour
     {
         if (currentState != GameState.InGame) return;
 
-        currentScore += ScorePowerPellet;
+        AddScore(ScorePowerPellet);
         totalPelletsRemaining--;
-
-        Debug.Log("Power Pellet Eaten. Score: " + currentScore + " | Pellets Left: " + totalPelletsRemaining);
 
         TriggerScaredState();
         CheckLevelComplete();
@@ -68,16 +79,14 @@ public class GameManager : MonoBehaviour
     {
         if (currentState != GameState.InGame) return;
 
-        currentScore += ScoreCherry;
-        Debug.Log("Cherry Eaten. Score: " + currentScore);
+        AddScore(ScoreCherry);
     }
 
     public void OnGhostEaten()
     {
         if (currentState != GameState.InGame) return;
 
-        currentScore += ScoreGhost;
-        Debug.Log("Ghost Eaten. Score: " + currentScore);
+        AddScore(ScoreGhost);
     }
 
     public void OnGhostTouched(GameObject ghost)
@@ -85,6 +94,16 @@ public class GameManager : MonoBehaviour
         if (currentState != GameState.InGame) return;
 
         Debug.Log("PacStudent touched a Ghost! Processing life loss...");
+    }
+
+    private void AddScore(int amount)
+    {
+        currentScore += amount;
+
+        if (uiManager != null)
+        {
+            uiManager.UpdateScoreUI(currentScore);
+        }
     }
 
     private void TriggerScaredState()

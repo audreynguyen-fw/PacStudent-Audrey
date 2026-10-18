@@ -1,21 +1,26 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class UIManager : MonoBehaviour
 {
+    [Header("HUD UI Elements")]
+    public TextMeshProUGUI scoreText;
+
     public void GoToStartScene()
     {
         SceneManager.LoadScene("StartScene");
     }
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
+    public void UpdateScoreUI(int currentScore)
     {
-        
+        if (scoreText != null)
+        {
+            scoreText.text = currentScore.ToString("D6");
+        }
+        else
+        {
+            Debug.LogWarning("UIManager: scoreText reference is missing in the Inspector!");
+        }
     }
 }
