@@ -27474,6 +27474,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   uiManager: {fileID: 1921369635}
+  tweener: {fileID: 837413450}
   pacStudent: {fileID: 911720577}
   deathParticle: {fileID: 356984240}
   sfxAudioSource: {fileID: 2034509100}
@@ -51780,6 +51781,7 @@ GameObject:
   - component: {fileID: 1730960327}
   - component: {fileID: 1730960326}
   - component: {fileID: 1730960325}
+  - component: {fileID: 1730960329}
   m_Layer: 5
   m_Name: HUD
   m_TagString: Untagged
@@ -51877,6 +51879,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!225 &1730960329
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1730960324}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1001 &1740717662
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -56430,6 +56444,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIManager
   scoreText: {fileID: 580744953}
+  hudCanvasGroup: {fileID: 1730960329}
   lifeIcons:
   - {fileID: 1345465000}
   - {fileID: 672194355}
