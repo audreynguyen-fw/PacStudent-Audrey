@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -29,6 +30,12 @@ public class GameManager : MonoBehaviour
     public GhostController[] ghosts;
     private Vector3[] ghostStartPositions;
 
+    [Header("Ghost Dead Settings")]
+    public AudioClip ghostDeadSound;
+    public float ghostDeadDuration = 3f;
+    private int deadGhostCount = 0;
+    private Coroutine[] deadRoutines;
+
     [Header("Audio Settings")]
     public AudioSource bgmAudioSource;
     public AudioClip introMusic;
@@ -47,6 +54,7 @@ public class GameManager : MonoBehaviour
     public int lives { get; private set; } = StartingLives;
 
     private float gameTimer = 0f;
+    private float scaredRemaining = 0f;
     private Coroutine scaredRoutine;
 
     private const int ScoreNormalPellet = 10;
@@ -74,13 +82,20 @@ public class GameManager : MonoBehaviour
             Debug.LogWarning("GameManager: pacStudent reference is missing in the Inspector!");
         }
 
-        if (ghosts == null || ghosts.Length < 4)
+        if (ghosts == null || ghosts.Length == 0)
         {
-            Debug.LogWarning("GameManager: ghosts array is missing or does not contain all 4 Ghosts in the Inspector!");
+            Debug.LogWarning("GameManager: ghosts array is missing or empty in the Inspector!");
         }
         else
         {
+            if (ghosts.Length < 4)
+            {
+                Debug.LogWarning("GameManager: ghosts array has less than 4 ghosts!");
+            }
+
             ghostStartPositions = new Vector3[ghosts.Length];
+            deadRoutines = new Coroutine[ghosts.Length];
+
             for (int i = 0; i < ghosts.Length; i++)
             {
                 if (ghosts[i] != null)
@@ -144,10 +159,26 @@ public class GameManager : MonoBehaviour
 
         currentState = GameState.InGame;
 
-        PlayBgm(normalBackgroundMusic);
+        UpdateBgm();
     }
 
-    public void PlayBgm(AudioClip clip)
+    public void UpdateBgm()
+    {
+        if (deadGhostCount > 0)
+        {
+            PlayBgm(deadMusic);
+        }
+        else if (scaredRoutine != null)
+        {
+            PlayBgm(scaredMusic);
+        }
+        else
+        {
+            PlayBgm(normalBackgroundMusic);
+        }
+    }
+
+    private void PlayBgm(AudioClip clip)
     {
         if (bgmAudioSource == null || clip == null) return;
 
@@ -204,7 +235,81 @@ public class GameManager : MonoBehaviour
     {
         if (currentState != GameState.InGame) return;
 
-        StartCoroutine(PacStudentDeathSequence());
+        GhostController gc = ghost.GetComponentInParent<GhostController>();
+        if (gc == null) return;
+
+        switch (gc.CurrentState)
+        {
+            case GhostState.Normal:
+                StartCoroutine(PacStudentDeathSequence());
+                break;
+
+            case GhostState.Scared:
+            case GhostState.Recovering:
+                EatGhost(gc);
+                break;
+
+            case GhostState.Dead:
+                break;
+        }
+    }
+
+    private void EatGhost(GhostController gc)
+    {
+        if (ghosts == null) return;
+
+        int index = Array.IndexOf(ghosts, gc);
+        if (index < 0) return;
+
+        OnGhostEaten();
+        gc.SetState(GhostState.Dead);
+        deadGhostCount++;
+
+        if (sfxAudioSource != null && ghostDeadSound != null)
+        {
+            sfxAudioSource.PlayOneShot(ghostDeadSound);
+        }
+
+        UpdateBgm();
+
+        if (deadRoutines != null && index < deadRoutines.Length)
+        {
+            if (deadRoutines[index] != null)
+            {
+                StopCoroutine(deadRoutines[index]);
+            }
+            deadRoutines[index] = StartCoroutine(GhostDeadRoutine(gc, index));
+        }
+    }
+
+    private IEnumerator GhostDeadRoutine(GhostController gc, int index)
+    {
+        yield return new WaitForSeconds(ghostDeadDuration);
+
+        deadGhostCount--;
+
+        if (scaredRoutine != null)
+        {
+            if (scaredRemaining <= recoverTime)
+            {
+                gc.SetState(GhostState.Recovering);
+            }
+            else
+            {
+                gc.SetState(GhostState.Scared);
+            }
+        }
+        else
+        {
+            gc.SetState(GhostState.Normal);
+        }
+
+        if (deadRoutines != null && index < deadRoutines.Length)
+        {
+            deadRoutines[index] = null;
+        }
+
+        UpdateBgm();
     }
 
     private void TriggerScaredState()
@@ -230,19 +335,19 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        PlayBgm(scaredMusic);
+        UpdateBgm();
 
-        float remaining = scaredDuration;
+        scaredRemaining = scaredDuration;
         bool recovering = false;
 
-        while (remaining > 0)
+        while (scaredRemaining > 0)
         {
             if (uiManager != null)
             {
-                uiManager.ShowScaredTimer(remaining);
+                uiManager.ShowScaredTimer(scaredRemaining);
             }
 
-            if (remaining <= recoverTime && !recovering)
+            if (scaredRemaining <= recoverTime && !recovering)
             {
                 if (ghosts != null)
                 {
@@ -257,7 +362,7 @@ public class GameManager : MonoBehaviour
                 recovering = true;
             }
 
-            remaining -= Time.deltaTime;
+            scaredRemaining -= Time.deltaTime;
             yield return null;
         }
 
@@ -277,8 +382,8 @@ public class GameManager : MonoBehaviour
             uiManager.HideScaredTimer();
         }
 
-        PlayBgm(normalBackgroundMusic);
         scaredRoutine = null;
+        UpdateBgm();
     }
 
     private IEnumerator PacStudentDeathSequence()
@@ -291,12 +396,26 @@ public class GameManager : MonoBehaviour
             scaredRoutine = null;
         }
 
+        if (deadRoutines != null)
+        {
+            for (int i = 0; i < deadRoutines.Length; i++)
+            {
+                if (deadRoutines[i] != null)
+                {
+                    StopCoroutine(deadRoutines[i]);
+                    deadRoutines[i] = null;
+                }
+            }
+        }
+
+        deadGhostCount = 0;
+
         if (uiManager != null)
         {
             uiManager.HideScaredTimer();
         }
 
-        PlayBgm(normalBackgroundMusic);
+        UpdateBgm();
 
         lives--;
         if (uiManager != null)
