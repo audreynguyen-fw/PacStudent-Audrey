@@ -9,13 +9,18 @@ public class PacStudentController : MonoBehaviour
     public Tweener tweener;
     public LevelGenerator levelGenerator;
     public Animator animator;
-    public AudioSource audioSource;
+    public AudioSource movementAudioSource;
+    public AudioSource sfxAudioSource;
     public AudioClip moveSound;
+    public AudioClip wallHitSound;
     public ParticleSystem dustParticle;
+    public ParticleSystem wallHitParticle;
 
     private KeyCode lastInput = KeyCode.None;
     private KeyCode currentInput = KeyCode.None;
     private Vector2 currentDirection = Vector2.right;
+
+    private bool isBumping = false;
 
     void Start()
     {
@@ -37,6 +42,7 @@ public class PacStudentController : MonoBehaviour
 
         if (!isMoving)
         {
+            CheckTeleport();
             TryMoveInDirection();
         }
     }
@@ -49,6 +55,24 @@ public class PacStudentController : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) lastInput = KeyCode.D;
     }
 
+    private void CheckTeleport()
+    {
+        int x = Mathf.RoundToInt(transform.position.x);
+        int y = Mathf.RoundToInt(transform.position.y);
+
+        if (y == -14)
+        {
+            if (x == 0 && currentDirection == Vector2.left)
+            {
+                transform.position = new Vector3(27f, -14f, 0f);
+            }
+            else if (x == 27 && currentDirection == Vector2.right)
+            {
+                transform.position = new Vector3(0f, -14f, 0f);
+            }
+        }
+    }
+
     private void TryMoveInDirection()
     {
         Vector2 lastDir = KeyToVector(lastInput);
@@ -56,6 +80,7 @@ public class PacStudentController : MonoBehaviour
         if (lastDir != Vector2.zero && IsWalkable(lastDir))
         {
             currentInput = lastInput;
+            isBumping = false;
             ExecuteTweenMove(lastDir);
         }
         else if (currentInput != KeyCode.None)
@@ -63,16 +88,38 @@ public class PacStudentController : MonoBehaviour
             Vector2 currentDir = KeyToVector(currentInput);
             if (IsWalkable(currentDir))
             {
+                isBumping = false;
                 ExecuteTweenMove(currentDir);
             }
             else
             {
+                HandleWallBump(currentDir);
                 StopEffects();
             }
         }
         else
         {
             StopEffects();
+        }
+    }
+
+    private void HandleWallBump(Vector2 bumpDir)
+    {
+        if (!isBumping)
+        {
+            isBumping = true;
+
+            if (sfxAudioSource != null && wallHitSound != null)
+            {
+                sfxAudioSource.PlayOneShot(wallHitSound);
+            }
+
+            if (wallHitParticle != null)
+            {
+                Vector3 hitPoint = transform.position + new Vector3(bumpDir.x * 0.5f, bumpDir.y * 0.5f, 0f);
+                wallHitParticle.transform.position = hitPoint;
+                wallHitParticle.Play();
+            }
         }
     }
 
@@ -104,7 +151,7 @@ public class PacStudentController : MonoBehaviour
     {
         if (animator != null) animator.speed = 0f;
         if (dustParticle != null && dustParticle.isPlaying) dustParticle.Stop();
-        if (audioSource != null && audioSource.isPlaying) audioSource.Stop();
+        if (movementAudioSource != null && movementAudioSource.isPlaying) movementAudioSource.Stop();
     }
 
     private Vector2 KeyToVector(KeyCode key)
@@ -133,18 +180,19 @@ public class PacStudentController : MonoBehaviour
     {
         if (levelGenerator == null) return false;
         Vector3 nextTargetPos = transform.position + new Vector3(dir.x, dir.y, 0f);
+
         return levelGenerator.IsWalkableGrid(nextTargetPos);
     }
 
     private void PlayMovementAudio()
     {
-        if (audioSource == null || moveSound == null) return;
+        if (movementAudioSource == null || moveSound == null) return;
 
-        if (!audioSource.isPlaying)
+        if (!movementAudioSource.isPlaying)
         {
-            audioSource.clip = moveSound;
-            audioSource.loop = true;
-            audioSource.Play();
+            movementAudioSource.clip = moveSound;
+            movementAudioSource.loop = true;
+            movementAudioSource.Play();
         }
     }
 }
