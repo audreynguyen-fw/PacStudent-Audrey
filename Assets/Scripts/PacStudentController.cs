@@ -21,9 +21,12 @@ public class PacStudentController : MonoBehaviour
     private Vector2 currentDirection = Vector2.right;
 
     private bool isBumping = false;
+    private Vector3 startPosition;
 
     void Start()
     {
+        startPosition = transform.position;
+
         if (levelGenerator == null)
             Debug.LogWarning("PacStudentController: LevelGenerator is not assigned in the Inspector!");
 
@@ -38,6 +41,11 @@ public class PacStudentController : MonoBehaviour
     {
         if (GameManager.Instance != null && GameManager.Instance.currentState != GameState.InGame)
         {
+            if (GameManager.Instance.currentState == GameState.PacStudentDying)
+            {
+                return;
+            }
+
             StopEffects();
             return;
         }
@@ -51,6 +59,45 @@ public class PacStudentController : MonoBehaviour
             CheckTeleport();
             TryMoveInDirection();
         }
+    }
+
+    public void Die()
+    {
+        if (tweener != null) tweener.RemoveTween(transform);
+
+        StopEffects();
+
+        if (animator != null)
+        {
+            animator.speed = 1f;
+            animator.SetTrigger("Die");
+        }
+    }
+
+    public void ResetToStart()
+    {
+        if (tweener != null) tweener.RemoveTween(transform);
+
+        transform.position = startPosition;
+        lastInput = KeyCode.None;
+        currentInput = KeyCode.None;
+        currentDirection = Vector2.right;
+        isBumping = false;
+
+        if (animator != null)
+        {
+            animator.ResetTrigger("MoveUp");
+            animator.ResetTrigger("MoveDown");
+            animator.ResetTrigger("MoveLeft");
+            animator.ResetTrigger("MoveRight");
+            animator.ResetTrigger("Die");
+
+            animator.Play("PacStudent_Walk_Right");
+            animator.Update(0f); // Force Animator cập nhật ngay khung hình xuất phát
+            animator.speed = 0f;
+        }
+
+        StopEffects();
     }
 
     private void GatherInput()
