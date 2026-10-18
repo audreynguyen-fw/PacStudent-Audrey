@@ -2328,7 +2328,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 10
+  m_SortingOrder: 30
   m_TargetDisplay: 0
 --- !u!1001 &88728036
 PrefabInstance:
@@ -23461,6 +23461,7 @@ GameObject:
   - component: {fileID: 834773092}
   - component: {fileID: 834773091}
   - component: {fileID: 834773094}
+  - component: {fileID: 834773095}
   m_Layer: 0
   m_Name: Ghost4
   m_TagString: Ghost
@@ -23601,6 +23602,18 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 0.5
+--- !u!114 &834773095
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 834773090}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9c926b7a07013746b40599d2a05cfd0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GhostController
 --- !u!1 &837413449
 GameObject:
   m_ObjectHideFlags: 0
@@ -27687,6 +27700,7 @@ GameObject:
   - component: {fileID: 1006858098}
   - component: {fileID: 1006858097}
   - component: {fileID: 1006858100}
+  - component: {fileID: 1006858101}
   m_Layer: 0
   m_Name: Ghost2
   m_TagString: Ghost
@@ -27827,6 +27841,18 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 0.5
+--- !u!114 &1006858101
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1006858096}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9c926b7a07013746b40599d2a05cfd0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GhostController
 --- !u!1001 &1011472169
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -51273,6 +51299,7 @@ GameObject:
   - component: {fileID: 1713000457}
   - component: {fileID: 1713000456}
   - component: {fileID: 1713000459}
+  - component: {fileID: 1713000460}
   m_Layer: 0
   m_Name: Ghost1
   m_TagString: Ghost
@@ -51413,6 +51440,18 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 0.5
+--- !u!114 &1713000460
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1713000455}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9c926b7a07013746b40599d2a05cfd0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GhostController
 --- !u!1001 &1715463734
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -53407,6 +53446,7 @@ GameObject:
   - component: {fileID: 1810083288}
   - component: {fileID: 1810083287}
   - component: {fileID: 1810083290}
+  - component: {fileID: 1810083291}
   m_Layer: 0
   m_Name: Ghost3
   m_TagString: Ghost
@@ -53547,6 +53587,18 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 0.5
+--- !u!114 &1810083291
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1810083286}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9c926b7a07013746b40599d2a05cfd0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GhostController
 --- !u!1001 &1810174629
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -53710,7 +53762,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 10
+  m_SortingOrder: 30
   m_TargetDisplay: 0
 --- !u!1001 &1813151909
 PrefabInstance:
@@ -60163,7 +60215,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 10
+  m_SortingOrder: 30
   m_TargetDisplay: 0
 --- !u!1 &2109605543
 GameObject:
@@ -60266,7 +60318,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 10
+  m_SortingOrder: 30
   m_TargetDisplay: 0
 --- !u!1001 &2115228375
 PrefabInstance:
