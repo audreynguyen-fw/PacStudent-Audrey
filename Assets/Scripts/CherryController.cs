@@ -26,9 +26,16 @@ public class CherryController : MonoBehaviour
     {
         while (true)
         {
+            // Chờ cho tới khi GameState chuyển hẳn sang InGame (sau khi đếm ngược kết thúc)
+            yield return new WaitUntil(() => GameManager.Instance != null && GameManager.Instance.currentState == GameState.InGame);
+
             yield return new WaitForSeconds(spawnInterval);
 
-            SpawnAndMoveCherry();
+            // Kiểm tra lại trạng thái InGame sau 5s chờ trước khi Instantiate
+            if (GameManager.Instance != null && GameManager.Instance.currentState == GameState.InGame)
+            {
+                SpawnAndMoveCherry();
+            }
 
             while (currentCherry != null)
             {

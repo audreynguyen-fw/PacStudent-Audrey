@@ -36,6 +36,12 @@ public class PacStudentController : MonoBehaviour
 
     void Update()
     {
+        if (GameManager.Instance != null && GameManager.Instance.currentState != GameState.InGame)
+        {
+            StopEffects();
+            return;
+        }
+
         GatherInput();
 
         bool isMoving = tweener != null && tweener.TweenExists(transform);

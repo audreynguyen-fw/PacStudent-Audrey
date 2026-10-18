@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public enum GameState
@@ -15,10 +16,17 @@ public class GameManager : MonoBehaviour
     [Header("UI Reference")]
     public UIManager uiManager;
 
+    [Header("Audio Settings")]
+    public AudioSource bgmAudioSource;
+    public AudioClip introMusic;
+    public AudioClip normalBackgroundMusic;
+
     [Header("Game State")]
-    public GameState currentState { get; private set; } = GameState.InGame;
+    public GameState currentState { get; private set; } = GameState.Countdown;
     public int currentScore { get; private set; } = 0;
     public int totalPelletsRemaining { get; private set; } = 0;
+
+    private float gameTimer = 0f;
 
     private const int ScoreNormalPellet = 10;
     private const int ScorePowerPellet = 50;
@@ -45,6 +53,56 @@ public class GameManager : MonoBehaviour
         else
         {
             uiManager.UpdateScoreUI(currentScore);
+            uiManager.UpdateGameTimerUI(0f);
+        }
+
+        StartCoroutine(StartCountdownRoutine());
+    }
+
+    private void Update()
+    {
+        if (currentState == GameState.InGame)
+        {
+            gameTimer += Time.deltaTime;
+            if (uiManager != null)
+            {
+                uiManager.UpdateGameTimerUI(gameTimer);
+            }
+        }
+    }
+
+    private IEnumerator StartCountdownRoutine()
+    {
+        currentState = GameState.Countdown;
+
+        if (bgmAudioSource != null && introMusic != null)
+        {
+            bgmAudioSource.clip = introMusic;
+            bgmAudioSource.loop = false;
+            bgmAudioSource.Play();
+        }
+
+        if (uiManager != null) uiManager.ShowCountdownText("3");
+        yield return new WaitForSeconds(1f);
+
+        if (uiManager != null) uiManager.ShowCountdownText("2");
+        yield return new WaitForSeconds(1f);
+
+        if (uiManager != null) uiManager.ShowCountdownText("1");
+        yield return new WaitForSeconds(1f);
+
+        if (uiManager != null) uiManager.ShowCountdownText("GO!");
+        yield return new WaitForSeconds(1f);
+
+        if (uiManager != null) uiManager.HideCountdownOverlay();
+
+        currentState = GameState.InGame;
+
+        if (bgmAudioSource != null && normalBackgroundMusic != null)
+        {
+            bgmAudioSource.clip = normalBackgroundMusic;
+            bgmAudioSource.loop = true;
+            bgmAudioSource.Play();
         }
     }
 
