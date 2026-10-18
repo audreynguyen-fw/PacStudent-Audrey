@@ -42,6 +42,10 @@ public class GameManager : MonoBehaviour
     private int deadGhostCount = 0;
     private Coroutine[] deadRoutines;
 
+    [Header("Collectible Sounds")]
+    public AudioClip cherrySound;
+    public AudioClip pelletSound;
+
     [Header("Audio Settings")]
     public AudioSource bgmAudioSource;
     public AudioClip introMusic;
@@ -210,6 +214,11 @@ public class GameManager : MonoBehaviour
         AddScore(ScoreNormalPellet);
         totalPelletsRemaining--;
 
+        if (sfxAudioSource != null && pelletSound != null)
+        {
+            sfxAudioSource.PlayOneShot(pelletSound);
+        }
+
         CheckLevelComplete();
     }
 
@@ -220,6 +229,11 @@ public class GameManager : MonoBehaviour
         AddScore(ScorePowerPellet);
         totalPelletsRemaining--;
 
+        if (sfxAudioSource != null && pelletSound != null)
+        {
+            sfxAudioSource.PlayOneShot(pelletSound);
+        }
+
         TriggerScaredState();
         CheckLevelComplete();
     }
@@ -229,6 +243,11 @@ public class GameManager : MonoBehaviour
         if (currentState != GameState.InGame) return;
 
         AddScore(ScoreCherry);
+
+        if (sfxAudioSource != null && cherrySound != null)
+        {
+            sfxAudioSource.PlayOneShot(cherrySound);
+        }
     }
 
     public void OnGhostEaten()
@@ -499,13 +518,11 @@ public class GameManager : MonoBehaviour
             uiManager.SetButtonsInteractable(false);
         }
 
-        // Dừng chuyển động của PacStudent
         if (tweener != null && pacStudent != null)
         {
             tweener.RemoveTween(pacStudent.transform);
         }
 
-        // Dừng chuyển động của tất cả Cherry đang bay trên màn hình
         if (tweener != null)
         {
             GameObject[] cherries = GameObject.FindGameObjectsWithTag("Cherry");
