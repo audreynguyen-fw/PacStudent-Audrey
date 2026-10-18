@@ -7,6 +7,9 @@ public class UIManager : MonoBehaviour
     [Header("HUD UI Elements")]
     public TextMeshProUGUI scoreText;
 
+    [Header("Lives UI Elements")]
+    public GameObject[] lifeIcons;
+
     [Header("Countdown UI Elements")]
     public GameObject countdownOverlay;
     public TextMeshProUGUI countdownText;
@@ -28,6 +31,19 @@ public class UIManager : MonoBehaviour
         else
         {
             Debug.LogWarning("UIManager: scoreText reference is missing in the Inspector!");
+        }
+    }
+
+    public void UpdateLivesUI(int currentLives)
+    {
+        if (lifeIcons == null) return;
+
+        for (int i = 0; i < lifeIcons.Length; i++)
+        {
+            if (lifeIcons[i] != null)
+            {
+                lifeIcons[i].SetActive(i < currentLives);
+            }
         }
     }
 
