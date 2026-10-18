@@ -27479,14 +27479,18 @@ MonoBehaviour:
   sfxAudioSource: {fileID: 2034509100}
   deathSound: {fileID: 8300000, guid: 7c5f4d7498db54c45ab82aac4a67a7b9, type: 3}
   deathAnimationDuration: 1.5
-  ghostTransforms:
-  - {fileID: 1713000458}
-  - {fileID: 1006858099}
-  - {fileID: 1810083289}
-  - {fileID: 834773093}
+  ghosts:
+  - {fileID: 1713000460}
+  - {fileID: 1006858101}
+  - {fileID: 1810083291}
+  - {fileID: 834773095}
   bgmAudioSource: {fileID: 2090491966}
   introMusic: {fileID: 8300000, guid: 5528a93dc95cb1645a9c640d7ed619db, type: 3}
   normalBackgroundMusic: {fileID: 8300000, guid: 19d4c0eae4fe0fd4e95ea119f1ff1576, type: 3}
+  scaredMusic: {fileID: 8300000, guid: cce6f0a52aef7994399c8a96d7c3df72, type: 3}
+  deadMusic: {fileID: 8300000, guid: 66b745e05264a1a44a10ea9bc55de3c2, type: 3}
+  scaredDuration: 10
+  recoverTime: 3
 --- !u!4 &999506398
 Transform:
   m_ObjectHideFlags: 0
@@ -56431,6 +56435,7 @@ MonoBehaviour:
   countdownOverlay: {fileID: 1075862386}
   countdownText: {fileID: 1293537617}
   timerText: {fileID: 351471601}
+  scaredTimerText: {fileID: 1919600807}
 --- !u!4 &1921369636
 Transform:
   m_ObjectHideFlags: 0
