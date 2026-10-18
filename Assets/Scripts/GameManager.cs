@@ -13,8 +13,21 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
+    private const int StartingLives = 3;
+
     [Header("UI Reference")]
     public UIManager uiManager;
+
+    [Header("PacStudent & Death References")]
+    public PacStudentController pacStudent;
+    public ParticleSystem deathParticle;
+    public AudioSource sfxAudioSource;
+    public AudioClip deathSound;
+    public float deathAnimationDuration = 1.5f;
+
+    [Header("Ghosts References")]
+    public Transform[] ghostTransforms;
+    private Vector3[] ghostStartPositions;
 
     [Header("Audio Settings")]
     public AudioSource bgmAudioSource;
@@ -25,6 +38,7 @@ public class GameManager : MonoBehaviour
     public GameState currentState { get; private set; } = GameState.Countdown;
     public int currentScore { get; private set; } = 0;
     public int totalPelletsRemaining { get; private set; } = 0;
+    public int lives { get; private set; } = StartingLives;
 
     private float gameTimer = 0f;
 
@@ -46,6 +60,28 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        lives = StartingLives;
+        if (pacStudent == null)
+        {
+            Debug.LogWarning("GameManager: pacStudent reference is missing in the Inspector!");
+        }
+
+        if (ghostTransforms == null || ghostTransforms.Length < 4)
+        {
+            Debug.LogWarning("GameManager: ghostTransforms is missing or does not contain all 4 Ghosts in the Inspector!");
+        }
+        else
+        {
+            ghostStartPositions = new Vector3[ghostTransforms.Length];
+            for (int i = 0; i < ghostTransforms.Length; i++)
+            {
+                if (ghostTransforms[i] != null)
+                {
+                    ghostStartPositions[i] = ghostTransforms[i].position;
+                }
+            }
+        }
+
         if (uiManager == null)
         {
             Debug.LogWarning("GameManager: UIManager reference is missing in the Inspector!");
@@ -54,6 +90,7 @@ public class GameManager : MonoBehaviour
         {
             uiManager.UpdateScoreUI(currentScore);
             uiManager.UpdateGameTimerUI(0f);
+            uiManager.UpdateLivesUI(lives);
         }
 
         StartCoroutine(StartCountdownRoutine());
@@ -151,7 +188,63 @@ public class GameManager : MonoBehaviour
     {
         if (currentState != GameState.InGame) return;
 
-        Debug.Log("PacStudent touched a Ghost! Processing life loss...");
+        StartCoroutine(PacStudentDeathSequence());
+    }
+
+    private IEnumerator PacStudentDeathSequence()
+    {
+        currentState = GameState.PacStudentDying;
+
+        lives--;
+        if (uiManager != null)
+        {
+            uiManager.UpdateLivesUI(lives);
+        }
+
+        if (pacStudent != null)
+        {
+            pacStudent.Die();
+
+            if (deathParticle != null)
+            {
+                deathParticle.transform.position = pacStudent.transform.position;
+                deathParticle.Play();
+            }
+        }
+
+        if (sfxAudioSource != null && deathSound != null)
+        {
+            sfxAudioSource.PlayOneShot(deathSound);
+        }
+
+        yield return new WaitForSeconds(deathAnimationDuration);
+
+        if (lives <= 0)
+        {
+            currentState = GameState.GameOver;
+            Debug.Log("Game Over! All lives lost.");
+        }
+        else
+        {
+            if (pacStudent != null) pacStudent.ResetToStart();
+
+            ResetGhostsToStart();
+
+            currentState = GameState.InGame;
+        }
+    }
+
+    private void ResetGhostsToStart()
+    {
+        if (ghostTransforms == null || ghostStartPositions == null) return;
+
+        for (int i = 0; i < ghostTransforms.Length; i++)
+        {
+            if (ghostTransforms[i] != null && i < ghostStartPositions.Length)
+            {
+                ghostTransforms[i].position = ghostStartPositions[i];
+            }
+        }
     }
 
     private void AddScore(int amount)
