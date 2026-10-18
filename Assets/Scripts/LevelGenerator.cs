@@ -37,13 +37,15 @@ public class LevelGenerator : MonoBehaviour
     private int rows;
     private int cols;
 
+    void Awake()
+    {
+        rows = levelMap.GetLength(0);
+        cols = levelMap.GetLength(1);
+    }
+
     void Start()
     {
         if (manualLevelParent != null) manualLevelParent.SetActive(false);
-
-        rows = levelMap.GetLength(0);
-        cols = levelMap.GetLength(1);
-
         GenerateFullLevel();
     }
 
@@ -71,11 +73,9 @@ public class LevelGenerator : MonoBehaviour
 
                 if (r < rows - 1)
                 {
-                    // 3. Bottom-Left (Lật đối xứng qua trục Y)
                     float rotBL = GetMirroredRotationY(val, rotTL);
                     SpawnTile(val, new Vector3(c, r, 0), Quaternion.Euler(0, 0, rotBL), qBottomLeft);
 
-                    // 4. Bottom-Right (Lật đối xứng cả X và Y)
                     float rotBR = GetMirroredRotationXY(val, rotTL);
                     SpawnTile(val, new Vector3(-c, r, 0), Quaternion.Euler(0, 0, rotBR), qBottomRight);
                 }
@@ -182,14 +182,13 @@ public class LevelGenerator : MonoBehaviour
         {
             if (rot == 180f) return 90f;
             if (rot == 90f) return 180f;
-            return rot;                   // 
+            return rot;                   
         }
         return rot;
     }
     
     float GetMirroredRotationY(int val, float rot)
     {
-        float normalizedRot = Mathf.Repeat(rot, 360f);
         if (val == 2 || val == 4) return (rot == 0f) ? 0f : 90f;
         if (val == 1 || val == 3)
         {
@@ -202,15 +201,14 @@ public class LevelGenerator : MonoBehaviour
         {
             if (rot == 270f) return 90f;
             if (rot == 90f) return 270f;
-            return rot;                   //
+            return rot;                   
         }
         return rot;
     }
     
     float GetMirroredRotationXY(int val, float rot)
     {
-        float normalizedRot = Mathf.Repeat(rot, 360f);
-        int r = Mathf.RoundToInt(normalizedRot);
+        int r = Mathf.RoundToInt(Mathf.Repeat(rot, 360f));
         
         if (val == 2 || val == 4) return (rot == 0f) ? 0f : 90f;
         if (val == 1 || val == 3)
@@ -269,5 +267,41 @@ public class LevelGenerator : MonoBehaviour
             case 8: return Wall_GhostExit;
             default: return null;
         }
+    }
+
+    public bool IsWalkableGrid(Vector3 worldPos)
+    {
+        int x = Mathf.RoundToInt(worldPos.x);
+        int y = Mathf.RoundToInt(worldPos.y);
+
+        int r = 0, c = 0;
+
+        if (x >= 0 && x <= 13 && y <= 0 && y >= -14)
+        {
+            c = x;
+            r = -y;
+        }
+        else if (x >= 14 && x <= 27 && y <= 0 && y >= -14)
+        {
+            c = 27 - x;
+            r = -y;
+        }
+        else if (x >= 0 && x <= 13 && y < -14 && y >= -28)
+        {
+            c = x;
+            r = 28 + y;
+        }
+        else if (x >= 14 && x <= 27 && y < -14 && y >= -28)
+        {
+            c = 27 - x;
+            r = 28 + y;
+        }
+        else
+        {
+            return false;
+        }
+
+        int val = GetMapValue(r, c);
+        return (val == 0 || val == 5 || val == 6);
     }
 }
