@@ -26,13 +26,19 @@ public class GameManager : MonoBehaviour
     public float deathAnimationDuration = 1.5f;
 
     [Header("Ghosts References")]
-    public Transform[] ghostTransforms;
+    public GhostController[] ghosts;
     private Vector3[] ghostStartPositions;
 
     [Header("Audio Settings")]
     public AudioSource bgmAudioSource;
     public AudioClip introMusic;
     public AudioClip normalBackgroundMusic;
+    public AudioClip scaredMusic;
+    public AudioClip deadMusic;
+
+    [Header("Ghost Scared Settings")]
+    [SerializeField] private float scaredDuration = 10f;
+    [SerializeField] private float recoverTime = 3f;
 
     [Header("Game State")]
     public GameState currentState { get; private set; } = GameState.Countdown;
@@ -41,6 +47,7 @@ public class GameManager : MonoBehaviour
     public int lives { get; private set; } = StartingLives;
 
     private float gameTimer = 0f;
+    private Coroutine scaredRoutine;
 
     private const int ScoreNormalPellet = 10;
     private const int ScorePowerPellet = 50;
@@ -61,23 +68,24 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         lives = StartingLives;
+
         if (pacStudent == null)
         {
             Debug.LogWarning("GameManager: pacStudent reference is missing in the Inspector!");
         }
 
-        if (ghostTransforms == null || ghostTransforms.Length < 4)
+        if (ghosts == null || ghosts.Length < 4)
         {
-            Debug.LogWarning("GameManager: ghostTransforms is missing or does not contain all 4 Ghosts in the Inspector!");
+            Debug.LogWarning("GameManager: ghosts array is missing or does not contain all 4 Ghosts in the Inspector!");
         }
         else
         {
-            ghostStartPositions = new Vector3[ghostTransforms.Length];
-            for (int i = 0; i < ghostTransforms.Length; i++)
+            ghostStartPositions = new Vector3[ghosts.Length];
+            for (int i = 0; i < ghosts.Length; i++)
             {
-                if (ghostTransforms[i] != null)
+                if (ghosts[i] != null)
                 {
-                    ghostStartPositions[i] = ghostTransforms[i].position;
+                    ghostStartPositions[i] = ghosts[i].transform.position;
                 }
             }
         }
@@ -91,6 +99,7 @@ public class GameManager : MonoBehaviour
             uiManager.UpdateScoreUI(currentScore);
             uiManager.UpdateGameTimerUI(0f);
             uiManager.UpdateLivesUI(lives);
+            uiManager.HideScaredTimer();
         }
 
         StartCoroutine(StartCountdownRoutine());
@@ -135,9 +144,16 @@ public class GameManager : MonoBehaviour
 
         currentState = GameState.InGame;
 
-        if (bgmAudioSource != null && normalBackgroundMusic != null)
+        PlayBgm(normalBackgroundMusic);
+    }
+
+    public void PlayBgm(AudioClip clip)
+    {
+        if (bgmAudioSource == null || clip == null) return;
+
+        if (bgmAudioSource.clip != clip || !bgmAudioSource.isPlaying)
         {
-            bgmAudioSource.clip = normalBackgroundMusic;
+            bgmAudioSource.clip = clip;
             bgmAudioSource.loop = true;
             bgmAudioSource.Play();
         }
@@ -191,9 +207,96 @@ public class GameManager : MonoBehaviour
         StartCoroutine(PacStudentDeathSequence());
     }
 
+    private void TriggerScaredState()
+    {
+        if (scaredRoutine != null)
+        {
+            StopCoroutine(scaredRoutine);
+        }
+
+        scaredRoutine = StartCoroutine(ScaredRoutine());
+    }
+
+    private IEnumerator ScaredRoutine()
+    {
+        if (ghosts != null)
+        {
+            foreach (var ghost in ghosts)
+            {
+                if (ghost != null && ghost.CurrentState != GhostState.Dead)
+                {
+                    ghost.SetState(GhostState.Scared);
+                }
+            }
+        }
+
+        PlayBgm(scaredMusic);
+
+        float remaining = scaredDuration;
+        bool recovering = false;
+
+        while (remaining > 0)
+        {
+            if (uiManager != null)
+            {
+                uiManager.ShowScaredTimer(remaining);
+            }
+
+            if (remaining <= recoverTime && !recovering)
+            {
+                if (ghosts != null)
+                {
+                    foreach (var ghost in ghosts)
+                    {
+                        if (ghost != null && ghost.CurrentState != GhostState.Dead)
+                        {
+                            ghost.SetState(GhostState.Recovering);
+                        }
+                    }
+                }
+                recovering = true;
+            }
+
+            remaining -= Time.deltaTime;
+            yield return null;
+        }
+
+        if (ghosts != null)
+        {
+            foreach (var ghost in ghosts)
+            {
+                if (ghost != null && ghost.CurrentState != GhostState.Dead)
+                {
+                    ghost.SetState(GhostState.Normal);
+                }
+            }
+        }
+
+        if (uiManager != null)
+        {
+            uiManager.HideScaredTimer();
+        }
+
+        PlayBgm(normalBackgroundMusic);
+        scaredRoutine = null;
+    }
+
     private IEnumerator PacStudentDeathSequence()
     {
         currentState = GameState.PacStudentDying;
+
+        if (scaredRoutine != null)
+        {
+            StopCoroutine(scaredRoutine);
+            scaredRoutine = null;
+        }
+
+        if (uiManager != null)
+        {
+            uiManager.HideScaredTimer();
+        }
+
+        PlayBgm(normalBackgroundMusic);
 
         lives--;
         if (uiManager != null)
@@ -236,13 +339,15 @@ public class GameManager : MonoBehaviour
 
     private void ResetGhostsToStart()
     {
-        if (ghostTransforms == null || ghostStartPositions == null) return;
+        if (ghosts == null || ghostStartPositions == null) return;
 
-        for (int i = 0; i < ghostTransforms.Length; i++)
+        for (int i = 0; i < ghosts.Length; i++)
         {
-            if (ghostTransforms[i] != null && i < ghostStartPositions.Length)
+            if (ghosts[i] != null && i < ghostStartPositions.Length)
             {
-                ghostTransforms[i].position = ghostStartPositions[i];
+                ghosts[i].transform.position = ghostStartPositions[i];
+                ghosts[i].SetState(GhostState.Normal);
+                ghosts[i].SetDirection(GhostDirection.Down);
             }
         }
     }
@@ -255,11 +360,6 @@ public class GameManager : MonoBehaviour
         {
             uiManager.UpdateScoreUI(currentScore);
         }
-    }
-
-    private void TriggerScaredState()
-    {
-        Debug.Log("Ghosts entered Frightened State!");
     }
 
     private void CheckLevelComplete()
