@@ -17,6 +17,9 @@ public class UIManager : MonoBehaviour
     [Header("Game Timer UI Element")]
     public TextMeshProUGUI timerText;
 
+    [Header("Ghost Scared Timer Element")]
+    public TextMeshProUGUI scaredTimerText;
+
     public void GoToStartScene()
     {
         SceneManager.LoadScene("StartScene");
@@ -67,5 +70,25 @@ public class UIManager : MonoBehaviour
         int centiseconds = Mathf.FloorToInt((totalSeconds * 100f) % 100f);
 
         timerText.text = string.Format("{0:D2}:{1:D2}:{2:D2}", minutes, seconds, centiseconds);
+    }
+
+    public void ShowScaredTimer(float secondsLeft)
+    {
+        if (scaredTimerText != null)
+        {
+            if (!scaredTimerText.gameObject.activeSelf)
+            {
+                scaredTimerText.gameObject.SetActive(true);
+            }
+            scaredTimerText.text = Mathf.CeilToInt(secondsLeft).ToString();
+        }
+    }
+
+    public void HideScaredTimer()
+    {
+        if (scaredTimerText != null && scaredTimerText.gameObject.activeSelf)
+        {
+            scaredTimerText.gameObject.SetActive(false);
+        }
     }
 }
