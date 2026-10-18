@@ -16,8 +16,14 @@ public class GameManager : MonoBehaviour
 
     private const int StartingLives = 3;
 
+    public const string HighScoreKey = "HighScore";
+    public const string HighScoreTimeKey = "HighScoreTime";
+
     [Header("UI Reference")]
     public UIManager uiManager;
+
+    [Header("Tweener Reference")]
+    public Tweener tweener;
 
     [Header("PacStudent & Death References")]
     public PacStudentController pacStudent;
@@ -56,6 +62,7 @@ public class GameManager : MonoBehaviour
     private float gameTimer = 0f;
     private float scaredRemaining = 0f;
     private Coroutine scaredRoutine;
+    private bool gameEnded = false;
 
     private const int ScoreNormalPellet = 10;
     private const int ScorePowerPellet = 50;
@@ -443,8 +450,7 @@ public class GameManager : MonoBehaviour
 
         if (lives <= 0)
         {
-            currentState = GameState.GameOver;
-            Debug.Log("Game Over! All lives lost.");
+            EndGame();
         }
         else
         {
@@ -453,6 +459,104 @@ public class GameManager : MonoBehaviour
             ResetGhostsToStart();
 
             currentState = GameState.InGame;
+        }
+    }
+
+    public void EndGame()
+    {
+        if (gameEnded) return;
+        gameEnded = true;
+
+        StartCoroutine(EndGameSequence());
+    }
+
+    private IEnumerator EndGameSequence()
+    {
+        currentState = GameState.GameOver;
+
+        if (scaredRoutine != null)
+        {
+            StopCoroutine(scaredRoutine);
+            scaredRoutine = null;
+        }
+
+        if (deadRoutines != null)
+        {
+            for (int i = 0; i < deadRoutines.Length; i++)
+            {
+                if (deadRoutines[i] != null)
+                {
+                    StopCoroutine(deadRoutines[i]);
+                    deadRoutines[i] = null;
+                }
+            }
+        }
+
+        if (uiManager != null)
+        {
+            uiManager.HideScaredTimer();
+            uiManager.ShowCountdownText("GAME OVER");
+            uiManager.SetButtonsInteractable(false);
+        }
+
+        // Dừng chuyển động của PacStudent
+        if (tweener != null && pacStudent != null)
+        {
+            tweener.RemoveTween(pacStudent.transform);
+        }
+
+        // Dừng chuyển động của tất cả Cherry đang bay trên màn hình
+        if (tweener != null)
+        {
+            GameObject[] cherries = GameObject.FindGameObjectsWithTag("Cherry");
+            foreach (GameObject cherry in cherries)
+            {
+                if (cherry != null)
+                {
+                    tweener.RemoveTween(cherry.transform);
+                }
+            }
+        }
+
+        SaveHighScore();
+
+        yield return new WaitForSeconds(3f);
+
+        if (uiManager != null)
+        {
+            uiManager.GoToStartScene();
+        }
+    }
+
+    private void SaveHighScore()
+    {
+        bool isNewRecord = false;
+
+        if (!PlayerPrefs.HasKey(HighScoreKey))
+        {
+            isNewRecord = true;
+        }
+        else
+        {
+            int oldScore = PlayerPrefs.GetInt(HighScoreKey, 0);
+            float oldTime = PlayerPrefs.GetFloat(HighScoreTimeKey, 0f);
+
+            if (currentScore > oldScore)
+            {
+                isNewRecord = true;
+            }
+            else if (currentScore == oldScore && gameTimer < oldTime)
+            {
+                isNewRecord = true;
+            }
+        }
+
+        if (isNewRecord)
+        {
+            PlayerPrefs.SetInt(HighScoreKey, currentScore);
+            PlayerPrefs.SetFloat(HighScoreTimeKey, gameTimer);
+            PlayerPrefs.Save();
+            Debug.Log($"New High Score Saved: {currentScore} in {gameTimer}s");
         }
     }
 
@@ -485,8 +589,7 @@ public class GameManager : MonoBehaviour
     {
         if (totalPelletsRemaining <= 0)
         {
-            currentState = GameState.GameOver;
-            Debug.Log("Level Complete! All pellets consumed.");
+            EndGame();
         }
     }
 }

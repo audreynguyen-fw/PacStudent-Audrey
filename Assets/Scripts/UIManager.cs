@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
 
@@ -6,6 +7,7 @@ public class UIManager : MonoBehaviour
 {
     [Header("HUD UI Elements")]
     public TextMeshProUGUI scoreText;
+    public CanvasGroup hudCanvasGroup;
 
     [Header("Lives UI Elements")]
     public GameObject[] lifeIcons;
@@ -89,6 +91,15 @@ public class UIManager : MonoBehaviour
         if (scaredTimerText != null && scaredTimerText.gameObject.activeSelf)
         {
             scaredTimerText.gameObject.SetActive(false);
+        }
+    }
+
+    public void SetButtonsInteractable(bool interactable)
+    {
+        if (hudCanvasGroup != null)
+        {
+            hudCanvasGroup.interactable = interactable;
+            hudCanvasGroup.blocksRaycasts = interactable;
         }
     }
 }
