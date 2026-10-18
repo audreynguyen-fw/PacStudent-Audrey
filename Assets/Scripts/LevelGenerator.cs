@@ -81,6 +81,23 @@ public class LevelGenerator : MonoBehaviour
                 }
             }
         }
+        RegisterPelletsToGameManager();
+    }
+
+    private void RegisterPelletsToGameManager()
+    {
+        GameObject[] normalPellets = GameObject.FindGameObjectsWithTag("Pellet");
+        GameObject[] powerPellets = GameObject.FindGameObjectsWithTag("PowerPellet");
+        int totalPellets = normalPellets.Length + powerPellets.Length;
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.SetTotalPellets(totalPellets);
+        }
+        else
+        {
+            Debug.LogWarning("LevelGenerator: GameManager Instance is null, could not register pellet count!");
+        }
     }
 
     int GetMapValue(int r, int c)
