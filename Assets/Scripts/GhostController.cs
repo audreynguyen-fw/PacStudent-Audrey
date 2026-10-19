@@ -22,6 +22,9 @@ public class GhostController : MonoBehaviour
     public GhostState CurrentState { get; private set; } = GhostState.Normal;
     public GhostDirection CurrentDirection { get; private set; } = GhostDirection.Down;
 
+    [Header("Ghost Identity")]
+    public int ghostId = 1; // 1 to 4
+
     [Header("Movement References")]
     public Tweener tweener;
     public LevelGenerator levelGenerator;
@@ -29,6 +32,7 @@ public class GhostController : MonoBehaviour
 
     private Animator animator;
     private string currentAnimName = "";
+    private bool isLeavingHouse = true;
 
     private void Awake()
     {
@@ -75,10 +79,68 @@ public class GhostController : MonoBehaviour
         UpdateAnimation();
     }
 
+    public void ResetLeavingHouseState()
+    {
+        isLeavingHouse = true;
+    }
+
     private void ChooseNextMoveAndMove()
     {
         if (levelGenerator == null || tweener == null) return;
 
+        if (isLeavingHouse)
+        {
+            MoveToExitHouse();
+        }
+        else
+        {
+            MoveRandomInMaze();
+        }
+    }
+
+    private void MoveToExitHouse()
+    {
+        int currentX = Mathf.RoundToInt(transform.position.x);
+        int currentY = Mathf.RoundToInt(transform.position.y);
+
+        int targetX = (currentX <= 13) ? 13 : 14;
+
+        GhostDirection nextDir;
+
+        if (currentX != targetX)
+        {
+            nextDir = (currentX < targetX) ? GhostDirection.Right : GhostDirection.Left;
+        }
+        else
+        {
+            bool exitUp = (ghostId % 2 != 0); // Ghost 1 & 3: Up, Ghost 2 & 4: Down
+            nextDir = exitUp ? GhostDirection.Up : GhostDirection.Down;
+
+            if (exitUp && currentY >= -11)
+            {
+                isLeavingHouse = false;
+                MoveRandomInMaze();
+                return;
+            }
+            else if (!exitUp && currentY <= -17)
+            {
+                isLeavingHouse = false;
+                MoveRandomInMaze();
+                return;
+            }
+        }
+
+        SetDirection(nextDir);
+
+        Vector3 startPos = transform.position;
+        Vector3 endPos = startPos + DirectionToVector3(nextDir);
+        float duration = GetSpeedForCurrentState();
+
+        tweener.AddTween(transform, startPos, endPos, duration);
+    }
+
+    private void MoveRandomInMaze()
+    {
         GhostDirection oppDir = GetOppositeDirection(CurrentDirection);
         List<GhostDirection> validDirections = new List<GhostDirection>();
 
