@@ -522,6 +522,17 @@ public class GameManager : MonoBehaviour
                     tweener.RemoveTween(cherry.transform);
                 }
             }
+
+            if (ghosts != null)
+            {
+                foreach (GhostController ghost in ghosts)
+                {
+                    if (ghost != null)
+                    {
+                        tweener.RemoveTween(ghost.transform);
+                    }
+                }
+            }
         }
 
         SaveHighScore();
@@ -574,9 +585,17 @@ public class GameManager : MonoBehaviour
         {
             if (ghosts[i] != null && i < ghostStartPositions.Length)
             {
+                if (tweener != null)
+                {
+                    tweener.RemoveTween(ghosts[i].transform);
+                }
+
                 ghosts[i].transform.position = ghostStartPositions[i];
+
                 ghosts[i].SetState(GhostState.Normal);
                 ghosts[i].SetDirection(GhostDirection.Down);
+
+                ghosts[i].ResetLeavingHouseState();
             }
         }
     }
