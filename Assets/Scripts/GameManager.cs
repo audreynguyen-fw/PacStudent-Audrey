@@ -335,6 +335,7 @@ public class GameManager : MonoBehaviour
         }
 
         scaredRoutine = StartCoroutine(ScaredRoutine());
+        UpdateBgm(); // Cập nhật BGM ngay sau khi gán biến scaredRoutine thành công
     }
 
     private IEnumerator ScaredRoutine()
