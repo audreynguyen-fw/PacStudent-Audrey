@@ -33,6 +33,7 @@ public class GhostController : MonoBehaviour
     private Animator animator;
     private string currentAnimName = "";
     private bool isLeavingHouse = true;
+    private Vector3 spawnPosition;
 
     private void Awake()
     {
@@ -49,6 +50,8 @@ public class GhostController : MonoBehaviour
 
     private void Start()
     {
+        spawnPosition = transform.position;
+
         if (tweener == null) Debug.LogWarning($"GhostController on {gameObject.name}: Tweener is missing!");
         if (levelGenerator == null) Debug.LogWarning($"GhostController on {gameObject.name}: LevelGenerator is missing!");
         if (pacStudent == null) Debug.LogWarning($"GhostController on {gameObject.name}: PacStudentController is missing!");
@@ -70,6 +73,12 @@ public class GhostController : MonoBehaviour
     public void SetState(GhostState newState)
     {
         CurrentState = newState;
+
+        if (newState == GhostState.Dead && tweener != null)
+        {
+            tweener.RemoveTween(transform);
+        }
+
         UpdateAnimation();
     }
 
@@ -88,6 +97,12 @@ public class GhostController : MonoBehaviour
     {
         if (levelGenerator == null || tweener == null) return;
 
+        if (CurrentState == GhostState.Dead)
+        {
+            MoveDeadToHome();
+            return;
+        }
+
         if (isLeavingHouse)
         {
             MoveToExitHouse();
@@ -96,6 +111,30 @@ public class GhostController : MonoBehaviour
         {
             MoveInMaze();
         }
+    }
+
+    private void MoveDeadToHome()
+    {
+        float distanceToHome = Vector3.Distance(transform.position, spawnPosition);
+
+        if (distanceToHome < 0.01f)
+        {
+            transform.position = spawnPosition;
+
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.OnGhostReachedHome(this);
+            }
+
+            ResetLeavingHouseState();
+            SetDirection(GhostDirection.Down);
+            return;
+        }
+
+        float timePerTile = GetSpeedForCurrentState();
+        float totalDuration = distanceToHome * timePerTile;
+
+        tweener.AddTween(transform, transform.position, spawnPosition, totalDuration);
     }
 
     private void MoveToExitHouse()
@@ -145,7 +184,6 @@ public class GhostController : MonoBehaviour
 
         if (validNonReverseDirs.Count == 0)
         {
-            // Ngõ cụt: Bắt buộc quay đầu
             GhostDirection oppDir = GetOppositeDirection(CurrentDirection);
             Vector3 targetPos = transform.position + DirectionToVector3(oppDir);
 
@@ -156,23 +194,19 @@ public class GhostController : MonoBehaviour
             return;
         }
 
-        // Quyết định chế độ chọn hướng theo State & GhostID
         bool isScaredOrRecovering = (CurrentState == GhostState.Scared || CurrentState == GhostState.Recovering);
         
         List<GhostDirection> candidateDirs = new List<GhostDirection>();
 
         if (isScaredOrRecovering || ghostId == 1)
         {
-            // Chạy xa PacStudent (>= khoảng cách hiện tại)
             candidateDirs = FilterDirectionsByDistance(validNonReverseDirs, awayFromPacStudent: true);
         }
         else if (ghostId == 2)
         {
-            // Tiến lại gần PacStudent (<= khoảng cách hiện tại)
             candidateDirs = FilterDirectionsByDistance(validNonReverseDirs, awayFromPacStudent: false);
         }
 
-        // Nếu danh sách sau khi lọc bị rỗng (hoặc Ghost 3, Ghost 4 chọn ngẫu nhiên), quay về danh sách chưa lọc
         if (candidateDirs.Count == 0)
         {
             candidateDirs = validNonReverseDirs;
@@ -264,10 +298,8 @@ public class GhostController : MonoBehaviour
 
             case GhostState.Scared:
             case GhostState.Recovering:
-                return (baseTimePerTile / 0.9f) * 2f;
-
             case GhostState.Dead:
-                return baseTimePerTile / 0.9f;
+                return (baseTimePerTile / 0.9f) * 2f;
 
             default:
                 return baseTimePerTile / 0.9f;

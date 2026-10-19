@@ -38,9 +38,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Ghost Dead Settings")]
     public AudioClip ghostDeadSound;
-    public float ghostDeadDuration = 3f;
     private int deadGhostCount = 0;
-    private Coroutine[] deadRoutines;
 
     [Header("Collectible Sounds")]
     public AudioClip cherrySound;
@@ -104,7 +102,6 @@ public class GameManager : MonoBehaviour
             }
 
             ghostStartPositions = new Vector3[ghosts.Length];
-            deadRoutines = new Coroutine[ghosts.Length];
 
             for (int i = 0; i < ghosts.Length; i++)
             {
@@ -286,21 +283,10 @@ public class GameManager : MonoBehaviour
         }
 
         UpdateBgm();
-
-        if (deadRoutines != null && index < deadRoutines.Length)
-        {
-            if (deadRoutines[index] != null)
-            {
-                StopCoroutine(deadRoutines[index]);
-            }
-            deadRoutines[index] = StartCoroutine(GhostDeadRoutine(gc, index));
-        }
     }
 
-    private IEnumerator GhostDeadRoutine(GhostController gc, int index)
+    public void OnGhostReachedHome(GhostController gc)
     {
-        yield return new WaitForSeconds(ghostDeadDuration);
-
         deadGhostCount--;
 
         if (scaredRoutine != null)
@@ -319,11 +305,6 @@ public class GameManager : MonoBehaviour
             gc.SetState(GhostState.Normal);
         }
 
-        if (deadRoutines != null && index < deadRoutines.Length)
-        {
-            deadRoutines[index] = null;
-        }
-
         UpdateBgm();
     }
 
@@ -335,7 +316,7 @@ public class GameManager : MonoBehaviour
         }
 
         scaredRoutine = StartCoroutine(ScaredRoutine());
-        UpdateBgm(); // Cập nhật BGM ngay sau khi gán biến scaredRoutine thành công
+        UpdateBgm();
     }
 
     private IEnumerator ScaredRoutine()
@@ -412,18 +393,6 @@ public class GameManager : MonoBehaviour
             scaredRoutine = null;
         }
 
-        if (deadRoutines != null)
-        {
-            for (int i = 0; i < deadRoutines.Length; i++)
-            {
-                if (deadRoutines[i] != null)
-                {
-                    StopCoroutine(deadRoutines[i]);
-                    deadRoutines[i] = null;
-                }
-            }
-        }
-
         deadGhostCount = 0;
 
         if (uiManager != null)
@@ -487,18 +456,6 @@ public class GameManager : MonoBehaviour
         {
             StopCoroutine(scaredRoutine);
             scaredRoutine = null;
-        }
-
-        if (deadRoutines != null)
-        {
-            for (int i = 0; i < deadRoutines.Length; i++)
-            {
-                if (deadRoutines[i] != null)
-                {
-                    StopCoroutine(deadRoutines[i]);
-                    deadRoutines[i] = null;
-                }
-            }
         }
 
         if (uiManager != null)
