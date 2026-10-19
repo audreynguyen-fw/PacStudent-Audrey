@@ -35,6 +35,8 @@ public class GhostController : MonoBehaviour
     private bool isLeavingHouse = true;
     private Vector3 spawnPosition;
 
+    private static Dictionary<Vector2Int, GhostDirection> loopDirections;
+
     private void Awake()
     {
         animator = GetComponent<Animator>();
@@ -46,6 +48,8 @@ public class GhostController : MonoBehaviour
                 Debug.LogWarning($"GhostController on {gameObject.name}: Missing Animator component!");
             }
         }
+
+        InitializeLoopDirections();
     }
 
     private void Start()
@@ -195,7 +199,22 @@ public class GhostController : MonoBehaviour
         }
 
         bool isScaredOrRecovering = (CurrentState == GhostState.Scared || CurrentState == GhostState.Recovering);
-        
+
+        // Logic bám vòng cố định cho Ghost 4 khi ở trạng thái Normal
+        if (ghostId == 4 && !isScaredOrRecovering)
+        {
+            Vector2Int currentGridPos = new Vector2Int(Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.y));
+
+            if (loopDirections.TryGetValue(currentGridPos, out GhostDirection loopDir))
+            {
+                if (validNonReverseDirs.Contains(loopDir))
+                {
+                    ExecuteMove(loopDir);
+                    return;
+                }
+            }
+        }
+
         List<GhostDirection> candidateDirs = new List<GhostDirection>();
 
         if (isScaredOrRecovering || ghostId == 1)
@@ -214,6 +233,48 @@ public class GhostController : MonoBehaviour
 
         GhostDirection chosenDir = candidateDirs[Random.Range(0, candidateDirs.Count)];
         ExecuteMove(chosenDir);
+    }
+
+    private void InitializeLoopDirections()
+    {
+        if (loopDirections != null) return;
+
+        loopDirections = new Dictionary<Vector2Int, GhostDirection>();
+
+        Vector2Int[] corners = new Vector2Int[]
+        {
+            new Vector2Int(1, -1),   new Vector2Int(12, -1),  new Vector2Int(12, -5),  new Vector2Int(15, -5),
+            new Vector2Int(15, -1),  new Vector2Int(26, -1),  new Vector2Int(26, -8),  new Vector2Int(21, -8),
+            new Vector2Int(21, -20), new Vector2Int(26, -20), new Vector2Int(26, -27), new Vector2Int(15, -27),
+            new Vector2Int(15, -23), new Vector2Int(12, -23), new Vector2Int(12, -27), new Vector2Int(1, -27),
+            new Vector2Int(1, -20),  new Vector2Int(6, -20),  new Vector2Int(6, -8),   new Vector2Int(1, -8)
+        };
+
+        for (int i = 0; i < corners.Length; i++)
+        {
+            Vector2Int start = corners[i];
+            Vector2Int end = corners[(i + 1) % corners.Length];
+
+            GhostDirection dir;
+            if (start.x < end.x) dir = GhostDirection.Right;
+            else if (start.x > end.x) dir = GhostDirection.Left;
+            else if (start.y < end.y) dir = GhostDirection.Up;
+            else dir = GhostDirection.Down;
+
+            Vector2Int current = start;
+            while (current != end)
+            {
+                if (!loopDirections.ContainsKey(current))
+                {
+                    loopDirections.Add(current, dir);
+                }
+
+                if (dir == GhostDirection.Right) current.x++;
+                else if (dir == GhostDirection.Left) current.x--;
+                else if (dir == GhostDirection.Up) current.y++;
+                else if (dir == GhostDirection.Down) current.y--;
+            }
+        }
     }
 
     private List<GhostDirection> GetValidNonReverseDirections()
