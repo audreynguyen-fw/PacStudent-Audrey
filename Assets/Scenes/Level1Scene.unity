@@ -23614,6 +23614,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9c926b7a07013746b40599d2a05cfd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GhostController
+  ghostId: 4
   tweener: {fileID: 837413450}
   levelGenerator: {fileID: 746696471}
   pacStudent: {fileID: 911720577}
@@ -27864,6 +27865,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9c926b7a07013746b40599d2a05cfd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GhostController
+  ghostId: 2
   tweener: {fileID: 837413450}
   levelGenerator: {fileID: 746696471}
   pacStudent: {fileID: 911720577}
@@ -51466,6 +51468,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9c926b7a07013746b40599d2a05cfd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GhostController
+  ghostId: 1
   tweener: {fileID: 837413450}
   levelGenerator: {fileID: 746696471}
   pacStudent: {fileID: 911720577}
@@ -53629,6 +53632,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9c926b7a07013746b40599d2a05cfd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GhostController
+  ghostId: 3
   tweener: {fileID: 837413450}
   levelGenerator: {fileID: 746696471}
   pacStudent: {fileID: 911720577}
