@@ -23614,6 +23614,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9c926b7a07013746b40599d2a05cfd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GhostController
+  tweener: {fileID: 837413450}
+  levelGenerator: {fileID: 746696471}
+  pacStudent: {fileID: 911720577}
 --- !u!1 &837413449
 GameObject:
   m_ObjectHideFlags: 0
@@ -27861,6 +27864,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9c926b7a07013746b40599d2a05cfd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GhostController
+  tweener: {fileID: 837413450}
+  levelGenerator: {fileID: 746696471}
+  pacStudent: {fileID: 911720577}
 --- !u!1001 &1011472169
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -51460,6 +51466,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9c926b7a07013746b40599d2a05cfd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GhostController
+  tweener: {fileID: 837413450}
+  levelGenerator: {fileID: 746696471}
+  pacStudent: {fileID: 911720577}
 --- !u!1001 &1715463734
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -53620,6 +53629,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9c926b7a07013746b40599d2a05cfd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GhostController
+  tweener: {fileID: 837413450}
+  levelGenerator: {fileID: 746696471}
+  pacStudent: {fileID: 911720577}
 --- !u!1001 &1810174629
 PrefabInstance:
   m_ObjectHideFlags: 0
