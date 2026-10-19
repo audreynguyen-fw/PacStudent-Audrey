@@ -23,7 +23,7 @@ public class GhostController : MonoBehaviour
     public GhostDirection CurrentDirection { get; private set; } = GhostDirection.Down;
 
     [Header("Ghost Identity")]
-    public int ghostId = 1; // 1 to 4
+    public int ghostId = 1;
 
     [Header("Movement References")]
     public Tweener tweener;
@@ -94,7 +94,7 @@ public class GhostController : MonoBehaviour
         }
         else
         {
-            MoveRandomInMaze();
+            MoveInMaze();
         }
     }
 
@@ -113,19 +113,19 @@ public class GhostController : MonoBehaviour
         }
         else
         {
-            bool exitUp = (ghostId % 2 != 0); // Ghost 1 & 3: Up, Ghost 2 & 4: Down
+            bool exitUp = (ghostId % 2 != 0);
             nextDir = exitUp ? GhostDirection.Up : GhostDirection.Down;
 
             if (exitUp && currentY >= -11)
             {
                 isLeavingHouse = false;
-                MoveRandomInMaze();
+                MoveInMaze();
                 return;
             }
             else if (!exitUp && currentY <= -17)
             {
                 isLeavingHouse = false;
-                MoveRandomInMaze();
+                MoveInMaze();
                 return;
             }
         }
@@ -139,10 +139,53 @@ public class GhostController : MonoBehaviour
         tweener.AddTween(transform, startPos, endPos, duration);
     }
 
-    private void MoveRandomInMaze()
+    private void MoveInMaze()
+    {
+        List<GhostDirection> validNonReverseDirs = GetValidNonReverseDirections();
+
+        if (validNonReverseDirs.Count == 0)
+        {
+            // Ngõ cụt: Bắt buộc quay đầu
+            GhostDirection oppDir = GetOppositeDirection(CurrentDirection);
+            Vector3 targetPos = transform.position + DirectionToVector3(oppDir);
+
+            if (levelGenerator.IsWalkableForGhost(targetPos))
+            {
+                ExecuteMove(oppDir);
+            }
+            return;
+        }
+
+        // Quyết định chế độ chọn hướng theo State & GhostID
+        bool isScaredOrRecovering = (CurrentState == GhostState.Scared || CurrentState == GhostState.Recovering);
+        
+        List<GhostDirection> candidateDirs = new List<GhostDirection>();
+
+        if (isScaredOrRecovering || ghostId == 1)
+        {
+            // Chạy xa PacStudent (>= khoảng cách hiện tại)
+            candidateDirs = FilterDirectionsByDistance(validNonReverseDirs, awayFromPacStudent: true);
+        }
+        else if (ghostId == 2)
+        {
+            // Tiến lại gần PacStudent (<= khoảng cách hiện tại)
+            candidateDirs = FilterDirectionsByDistance(validNonReverseDirs, awayFromPacStudent: false);
+        }
+
+        // Nếu danh sách sau khi lọc bị rỗng (hoặc Ghost 3, Ghost 4 chọn ngẫu nhiên), quay về danh sách chưa lọc
+        if (candidateDirs.Count == 0)
+        {
+            candidateDirs = validNonReverseDirs;
+        }
+
+        GhostDirection chosenDir = candidateDirs[Random.Range(0, candidateDirs.Count)];
+        ExecuteMove(chosenDir);
+    }
+
+    private List<GhostDirection> GetValidNonReverseDirections()
     {
         GhostDirection oppDir = GetOppositeDirection(CurrentDirection);
-        List<GhostDirection> validDirections = new List<GhostDirection>();
+        List<GhostDirection> result = new List<GhostDirection>();
 
         GhostDirection[] allDirections = new GhostDirection[]
         {
@@ -154,29 +197,53 @@ public class GhostController : MonoBehaviour
 
         foreach (GhostDirection dir in allDirections)
         {
+            if (dir == oppDir) continue;
+
             Vector3 targetPos = transform.position + DirectionToVector3(dir);
             if (levelGenerator.IsWalkableForGhost(targetPos))
             {
-                validDirections.Add(dir);
+                result.Add(dir);
             }
         }
 
-        if (validDirections.Count == 0) return;
+        return result;
+    }
 
-        GhostDirection chosenDir;
+    private List<GhostDirection> FilterDirectionsByDistance(List<GhostDirection> inputDirections, bool awayFromPacStudent)
+    {
+        List<GhostDirection> filtered = new List<GhostDirection>();
 
-        List<GhostDirection> nonReverseDirections = new List<GhostDirection>(validDirections);
-        nonReverseDirections.Remove(oppDir);
+        if (pacStudent == null) return filtered;
 
-        if (nonReverseDirections.Count > 0)
+        Vector3 pacPos = pacStudent.transform.position;
+        float currentSqrDist = (transform.position - pacPos).sqrMagnitude;
+
+        foreach (GhostDirection dir in inputDirections)
         {
-            chosenDir = nonReverseDirections[Random.Range(0, nonReverseDirections.Count)];
-        }
-        else
-        {
-            chosenDir = validDirections[0];
+            Vector3 nextTilePos = transform.position + DirectionToVector3(dir);
+            float nextSqrDist = (nextTilePos - pacPos).sqrMagnitude;
+
+            if (awayFromPacStudent)
+            {
+                if (nextSqrDist >= currentSqrDist)
+                {
+                    filtered.Add(dir);
+                }
+            }
+            else
+            {
+                if (nextSqrDist <= currentSqrDist)
+                {
+                    filtered.Add(dir);
+                }
+            }
         }
 
+        return filtered;
+    }
+
+    private void ExecuteMove(GhostDirection chosenDir)
+    {
         SetDirection(chosenDir);
 
         Vector3 startPos = transform.position;
