@@ -199,7 +199,7 @@ public class LevelGenerator : MonoBehaviour
         {
             if (rot == 180f) return 90f;
             if (rot == 90f) return 180f;
-            return rot;                   
+            return rot;                    
         }
         return rot;
     }
@@ -218,7 +218,7 @@ public class LevelGenerator : MonoBehaviour
         {
             if (rot == 270f) return 90f;
             if (rot == 90f) return 270f;
-            return rot;                   
+            return rot;                    
         }
         return rot;
     }
@@ -320,5 +320,19 @@ public class LevelGenerator : MonoBehaviour
 
         int val = GetMapValue(r, c);
         return (val == 0 || val == 5 || val == 6);
+    }
+
+    public bool IsWalkableForGhost(Vector3 worldPos)
+    {
+        int x = Mathf.RoundToInt(worldPos.x);
+        int y = Mathf.RoundToInt(worldPos.y);
+
+        // Chặn Ghost đi vào 2 ô cổng dịch chuyển ở 2 mép bản đồ
+        if (y == -14 && (x == 0 || x == 27))
+        {
+            return false;
+        }
+
+        return IsWalkableGrid(worldPos);
     }
 }
