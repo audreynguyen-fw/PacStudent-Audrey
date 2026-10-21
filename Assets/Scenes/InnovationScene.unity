@@ -4835,6 +4835,59 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6641403027500597694, guid: 756c25d93bd1ba54eb38ed187e8febf6, type: 3}
   m_PrefabInstance: {fileID: 178192183}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &180692833
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 180692835}
+  - component: {fileID: 180692834}
+  m_Layer: 0
+  m_Name: PickupSpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &180692834
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 180692833}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfc2af93a9a5ad54d832111b8f0948e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PickupSpawner
+  orbPrefabs:
+  - {fileID: 2768672180039823325, guid: e7ab8111d7c79bc49bd4981b67aded3e, type: 3}
+  - {fileID: 2637105408005535035, guid: c18180ee5aefbd249b5fd6599d52058c, type: 3}
+  - {fileID: 4276980434453837260, guid: 8a6ba99d4aed4c44abedde4d1a4cef63, type: 3}
+  pacStudent: {fileID: 0}
+  spawnInterval: 8
+  maxOrbsOnMap: 2
+  orbLifetime: 12
+  minDistanceFromPacStudent: 5
+--- !u!4 &180692835
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 180692833}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &181124618
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -61065,3 +61118,4 @@ SceneRoots:
   - {fileID: 2034509101}
   - {fileID: 1310004735}
   - {fileID: 356984241}
+  - {fileID: 180692835}
