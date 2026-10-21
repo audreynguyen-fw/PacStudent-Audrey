@@ -18,11 +18,14 @@ public class AbilityManager : MonoBehaviour
     public PacStudentController pacStudent;
     [SerializeField] private float speedBoostDuration = 4.0f;
     [SerializeField] private float speedMultiplierValue = 1.6f;
+    [SerializeField] private float freezeDuration = 4.0f;
 
     public AbilityType CurrentAbility { get; private set; } = AbilityType.None;
     public bool IsSpeedBoostActive { get; private set; } = false;
+    public bool IsFreezeActive { get; private set; } = false;
 
     private Coroutine speedBoostRoutine;
+    private Coroutine freezeRoutine;
 
     private void Awake()
     {
@@ -77,7 +80,7 @@ public class AbilityManager : MonoBehaviour
                 break;
 
             case AbilityType.Freeze:
-                Debug.Log("[AbilityManager] Used Freeze (Logic in 4b)");
+                TriggerFreeze();
                 break;
 
             case AbilityType.Shield:
@@ -114,6 +117,45 @@ public class AbilityManager : MonoBehaviour
 
         IsSpeedBoostActive = false;
         speedBoostRoutine = null;
+    }
+
+    private void TriggerFreeze()
+    {
+        if (freezeRoutine != null)
+        {
+            StopCoroutine(freezeRoutine);
+        }
+
+        freezeRoutine = StartCoroutine(FreezeRoutine());
+    }
+
+    private IEnumerator FreezeRoutine()
+    {
+        IsFreezeActive = true;
+        SetAllGhostsFrozen(true);
+
+        yield return new WaitForSeconds(freezeDuration);
+
+        SetAllGhostsFrozen(false);
+        IsFreezeActive = false;
+        freezeRoutine = null;
+    }
+
+    private void SetAllGhostsFrozen(bool freeze)
+    {
+        if (GameManager.Instance == null || GameManager.Instance.ghosts == null) return;
+
+        foreach (GhostController ghost in GameManager.Instance.ghosts)
+        {
+            if (ghost != null)
+            {
+                if (freeze && ghost.CurrentState == GhostState.Dead)
+                {
+                    continue;
+                }
+                ghost.SetFrozen(freeze);
+            }
+        }
     }
 
     private void UpdateSlotUI()
@@ -153,12 +195,21 @@ public class AbilityManager : MonoBehaviour
             speedBoostRoutine = null;
         }
 
+        if (freezeRoutine != null)
+        {
+            StopCoroutine(freezeRoutine);
+            freezeRoutine = null;
+        }
+
         if (pacStudent != null)
         {
             pacStudent.speedMultiplier = 1.0f;
         }
 
+        SetAllGhostsFrozen(false);
+
         IsSpeedBoostActive = false;
+        IsFreezeActive = false;
         CurrentAbility = AbilityType.None;
         UpdateSlotUI();
     }

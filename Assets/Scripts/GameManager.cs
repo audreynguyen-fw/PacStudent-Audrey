@@ -252,6 +252,7 @@ public class GameManager : MonoBehaviour
 
         GhostController gc = ghost.GetComponentInParent<GhostController>();
         if (gc == null) return;
+        if (gc.IsFrozen) return;
 
         switch (gc.CurrentState)
         {
@@ -558,6 +559,7 @@ public class GameManager : MonoBehaviour
                 ghosts[i].SetState(GhostState.Normal);
                 ghosts[i].SetDirection(GhostDirection.Down);
 
+                ghosts[i].SetFrozen(false);
                 ghosts[i].ResetLeavingHouseState();
             }
         }

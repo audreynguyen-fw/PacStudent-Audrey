@@ -22,6 +22,8 @@ public class GhostController : MonoBehaviour
     public GhostState CurrentState { get; private set; } = GhostState.Normal;
     public GhostDirection CurrentDirection { get; private set; } = GhostDirection.Down;
 
+    public bool IsFrozen { get; private set; } = false;
+
     [Header("Ghost Identity")]
     public int ghostId = 1;
 
@@ -68,9 +70,23 @@ public class GhostController : MonoBehaviour
             return;
         }
 
+        if (IsFrozen && CurrentState != GhostState.Dead)
+        {
+            return;
+        }
+
         if (tweener != null && !tweener.TweenExists(transform))
         {
             ChooseNextMoveAndMove();
+        }
+    }
+
+    public void SetFrozen(bool freeze)
+    {
+        IsFrozen = freeze;
+        if (animator != null)
+        {
+            animator.speed = freeze ? 0f : 1f;
         }
     }
 
@@ -78,9 +94,13 @@ public class GhostController : MonoBehaviour
     {
         CurrentState = newState;
 
-        if (newState == GhostState.Dead && tweener != null)
+        if (newState == GhostState.Dead)
         {
-            tweener.RemoveTween(transform);
+            SetFrozen(false);
+            if (tweener != null)
+            {
+                tweener.RemoveTween(transform);
+            }
         }
 
         UpdateAnimation();
