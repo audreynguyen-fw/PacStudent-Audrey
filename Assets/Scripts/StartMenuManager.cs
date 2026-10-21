@@ -13,11 +13,18 @@ public class StartMenuManager : MonoBehaviour
         PlaySound(clickSound);
         SceneManager.LoadScene("Level1Scene"); 
     }
+
+    public void LoadLevel2()
+    {
+        PlaySound(clickSound);
+        SceneManager.LoadScene("InnovationScene"); 
+    }
     
     public void PlayHoverSound()
     {
         PlaySound(hoverSound);
     }
+
     private void PlaySound(AudioClip clip)
     {
         if (audioSource != null && clip != null)
