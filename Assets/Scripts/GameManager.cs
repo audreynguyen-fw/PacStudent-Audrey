@@ -54,6 +54,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private float scaredDuration = 10f;
     [SerializeField] private float recoverTime = 3f;
 
+    [Header("High Score Settings")]
+    [SerializeField] private bool saveHighScore = true;
+
     [Header("Game State")]
     public GameState currentState { get; private set; } = GameState.Countdown;
     public int currentScore { get; private set; } = 0;
@@ -505,6 +508,8 @@ public class GameManager : MonoBehaviour
 
     private void SaveHighScore()
     {
+        if (!saveHighScore) return;
+
         bool isNewRecord = false;
 
         if (!PlayerPrefs.HasKey(HighScoreKey))

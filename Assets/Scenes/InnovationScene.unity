@@ -27490,7 +27490,6 @@ MonoBehaviour:
   - {fileID: 1810083291}
   - {fileID: 834773095}
   ghostDeadSound: {fileID: 8300000, guid: de7e9df9868921b4f96484dc8a8cf9b7, type: 3}
-  ghostDeadDuration: 3
   cherrySound: {fileID: 8300000, guid: 8f783cffbc8b92a4d9b07a9ed19cec7b, type: 3}
   bgmAudioSource: {fileID: 2090491966}
   introMusic: {fileID: 8300000, guid: 5528a93dc95cb1645a9c640d7ed619db, type: 3}
@@ -27499,6 +27498,7 @@ MonoBehaviour:
   deadMusic: {fileID: 8300000, guid: 66b745e05264a1a44a10ea9bc55de3c2, type: 3}
   scaredDuration: 10
   recoverTime: 3
+  saveHighScore: 0
 --- !u!4 &999506398
 Transform:
   m_ObjectHideFlags: 0
