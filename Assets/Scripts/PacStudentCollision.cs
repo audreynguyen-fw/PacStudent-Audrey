@@ -6,6 +6,7 @@ public class PacStudentCollision : MonoBehaviour
     private const string TagPowerPellet = "PowerPellet";
     private const string TagCherry = "Cherry";
     private const string TagGhost = "Ghost";
+    private const string TagPickup = "Pickup";
 
     private void Start()
     {
@@ -38,6 +39,15 @@ public class PacStudentCollision : MonoBehaviour
         else if (other.CompareTag(TagGhost))
         {
             GameManager.Instance.OnGhostTouched(other.gameObject);
+        }
+        else if (other.CompareTag(TagPickup))
+        {
+            PickupController pickup = other.GetComponent<PickupController>();
+            if (pickup != null)
+            {
+                Debug.Log($"[PacStudentCollision] Picked up Skill Orb: {pickup.abilityType}");
+            }
+            Destroy(other.gameObject);
         }
     }
 }

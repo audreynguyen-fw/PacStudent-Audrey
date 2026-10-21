@@ -8,6 +8,7 @@ TagManager:
   - PowerPellet
   - Cherry
   - Ghost
+  - Pickup
   layers:
   - Default
   - TransparentFX
