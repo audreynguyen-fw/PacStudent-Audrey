@@ -82,7 +82,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 15
   m_MaskInteraction: 0
   m_Sprite: {fileID: 5798485818029744895, guid: 6a98f51db35381540b307caaa25484b8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -107,6 +107,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PickupController
   abilityType: 2
+  speedSprite: {fileID: 0}
+  freezeSprite: {fileID: 0}
+  shieldSprite: {fileID: 0}
+  pulseAmplitude: 0.15
+  pulseSpeed: 6
 --- !u!95 &7774459347483596184
 Animator:
   serializedVersion: 7

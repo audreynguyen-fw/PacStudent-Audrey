@@ -4868,7 +4868,7 @@ MonoBehaviour:
   - {fileID: 2768672180039823325, guid: e7ab8111d7c79bc49bd4981b67aded3e, type: 3}
   - {fileID: 2637105408005535035, guid: c18180ee5aefbd249b5fd6599d52058c, type: 3}
   - {fileID: 4276980434453837260, guid: 8a6ba99d4aed4c44abedde4d1a4cef63, type: 3}
-  pacStudent: {fileID: 0}
+  pacStudent: {fileID: 911720577}
   spawnInterval: 8
   maxOrbsOnMap: 2
   orbLifetime: 12
