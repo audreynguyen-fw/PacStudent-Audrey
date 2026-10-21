@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,7 +14,15 @@ public class AbilityManager : MonoBehaviour
     public Sprite freezeSprite;
     public Sprite shieldSprite;
 
+    [Header("Ability Settings")]
+    public PacStudentController pacStudent;
+    [SerializeField] private float speedBoostDuration = 4.0f;
+    [SerializeField] private float speedMultiplierValue = 1.6f;
+
     public AbilityType CurrentAbility { get; private set; } = AbilityType.None;
+    public bool IsSpeedBoostActive { get; private set; } = false;
+
+    private Coroutine speedBoostRoutine;
 
     private void Awake()
     {
@@ -28,6 +37,11 @@ public class AbilityManager : MonoBehaviour
 
     private void Start()
     {
+        if (pacStudent == null)
+        {
+            pacStudent = Object.FindFirstObjectByType<PacStudentController>();
+        }
+
         UpdateSlotUI();
     }
 
@@ -56,7 +70,50 @@ public class AbilityManager : MonoBehaviour
         CurrentAbility = AbilityType.None;
         UpdateSlotUI();
 
-        Debug.Log($"[AbilityManager] Used ability: {usedAbility}");
+        switch (usedAbility)
+        {
+            case AbilityType.SpeedBoost:
+                TriggerSpeedBoost();
+                break;
+
+            case AbilityType.Freeze:
+                Debug.Log("[AbilityManager] Used Freeze (Logic in 4b)");
+                break;
+
+            case AbilityType.Shield:
+                Debug.Log("[AbilityManager] Used Shield (Logic in 4c)");
+                break;
+        }
+    }
+
+    private void TriggerSpeedBoost()
+    {
+        if (speedBoostRoutine != null)
+        {
+            StopCoroutine(speedBoostRoutine);
+        }
+
+        speedBoostRoutine = StartCoroutine(SpeedBoostRoutine());
+    }
+
+    private IEnumerator SpeedBoostRoutine()
+    {
+        IsSpeedBoostActive = true;
+
+        if (pacStudent != null)
+        {
+            pacStudent.speedMultiplier = speedMultiplierValue;
+        }
+
+        yield return new WaitForSeconds(speedBoostDuration);
+
+        if (pacStudent != null)
+        {
+            pacStudent.speedMultiplier = 1.0f;
+        }
+
+        IsSpeedBoostActive = false;
+        speedBoostRoutine = null;
     }
 
     private void UpdateSlotUI()
@@ -86,5 +143,23 @@ public class AbilityManager : MonoBehaviour
 
             slotIcon.enabled = true;
         }
+    }
+
+    public void ResetAllAbilities()
+    {
+        if (speedBoostRoutine != null)
+        {
+            StopCoroutine(speedBoostRoutine);
+            speedBoostRoutine = null;
+        }
+
+        if (pacStudent != null)
+        {
+            pacStudent.speedMultiplier = 1.0f;
+        }
+
+        IsSpeedBoostActive = false;
+        CurrentAbility = AbilityType.None;
+        UpdateSlotUI();
     }
 }

@@ -4,6 +4,7 @@ public class PacStudentController : MonoBehaviour
 {
     [Header("Movement Settings")]
     public float timePerTile = 0.2f;
+    [HideInInspector] public float speedMultiplier = 1.0f;
 
     [Header("References")]
     public Tweener tweener;
@@ -83,6 +84,7 @@ public class PacStudentController : MonoBehaviour
         currentInput = KeyCode.None;
         currentDirection = Vector2.right;
         isBumping = false;
+        speedMultiplier = 1.0f;
 
         if (animator != null)
         {
@@ -183,7 +185,8 @@ public class PacStudentController : MonoBehaviour
 
         if (tweener != null)
         {
-            tweener.AddTween(transform, startPos, endPos, timePerTile);
+            float duration = timePerTile / Mathf.Max(0.1f, speedMultiplier);
+            tweener.AddTween(transform, startPos, endPos, duration);
         }
 
         if (dir != currentDirection)

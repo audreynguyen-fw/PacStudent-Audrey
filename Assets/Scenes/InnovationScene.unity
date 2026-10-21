@@ -25324,6 +25324,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PacStudentController
   timePerTile: 0.2
+  speedMultiplier: 1
   tweener: {fileID: 837413450}
   levelGenerator: {fileID: 746696471}
   animator: {fileID: 911720572}
@@ -28342,6 +28343,9 @@ MonoBehaviour:
   speedSprite: {fileID: 6962496110692253193, guid: d87c04ec7025bbf4a9b9d0ebd47b324c, type: 3}
   freezeSprite: {fileID: 5798485818029744895, guid: 6a98f51db35381540b307caaa25484b8, type: 3}
   shieldSprite: {fileID: -6717884257390833292, guid: bb7534aaadf89d34395ca8679d33d9c0, type: 3}
+  pacStudent: {fileID: 911720577}
+  speedBoostDuration: 4
+  speedMultiplierValue: 1.6
 --- !u!4 &1023851163
 Transform:
   m_ObjectHideFlags: 0
