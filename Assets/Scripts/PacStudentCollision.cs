@@ -43,9 +43,9 @@ public class PacStudentCollision : MonoBehaviour
         else if (other.CompareTag(TagPickup))
         {
             PickupController pickup = other.GetComponent<PickupController>();
-            if (pickup != null)
+            if (pickup != null && AbilityManager.Instance != null)
             {
-                Debug.Log($"[PacStudentCollision] Picked up Skill Orb: {pickup.abilityType}");
+                AbilityManager.Instance.CollectAbility(pickup.abilityType);
             }
             Destroy(other.gameObject);
         }
