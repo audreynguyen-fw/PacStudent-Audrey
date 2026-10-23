@@ -27,6 +27,9 @@ public class GhostController : MonoBehaviour
     [Header("Ghost Identity")]
     public int ghostId = 1;
 
+    [Header("Visual Indicators")]
+    [SerializeField] private GameObject freezeIndicator;
+
     [Header("Movement References")]
     public Tweener tweener;
     public LevelGenerator levelGenerator;
@@ -58,6 +61,11 @@ public class GhostController : MonoBehaviour
     {
         spawnPosition = transform.position;
 
+        if (freezeIndicator != null)
+        {
+            freezeIndicator.SetActive(false);
+        }
+
         if (tweener == null) Debug.LogWarning($"GhostController on {gameObject.name}: Tweener is missing!");
         if (levelGenerator == null) Debug.LogWarning($"GhostController on {gameObject.name}: LevelGenerator is missing!");
         if (pacStudent == null) Debug.LogWarning($"GhostController on {gameObject.name}: PacStudentController is missing!");
@@ -87,6 +95,11 @@ public class GhostController : MonoBehaviour
         if (animator != null)
         {
             animator.speed = freeze ? 0f : 1f;
+        }
+
+        if (freezeIndicator != null)
+        {
+            freezeIndicator.SetActive(freeze);
         }
     }
 
