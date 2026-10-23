@@ -31,6 +31,9 @@ public class AbilityManager : MonoBehaviour
     public bool IsShieldActive { get; private set; } = false;
     public bool IsInGracePeriod { get; private set; } = false;
 
+    public float SpeedRemaining { get; private set; } = 0f;
+    public float FreezeRemaining { get; private set; } = 0f;
+
     private Coroutine speedBoostRoutine;
     private Coroutine freezeRoutine;
     private Coroutine gracePeriodRoutine;
@@ -97,7 +100,6 @@ public class AbilityManager : MonoBehaviour
             case AbilityType.Shield:
                 IsShieldActive = true;
                 SetIndicatorActive(shieldIndicator, true);
-                Debug.Log("[AbilityManager] Shield activated!");
                 break;
         }
     }
@@ -109,13 +111,11 @@ public class AbilityManager : MonoBehaviour
             IsShieldActive = false;
             SetIndicatorActive(shieldIndicator, false);
             StartGracePeriod();
-            Debug.Log("[AbilityManager] Shield absorbed a hit!");
             return true;
         }
 
         if (IsInGracePeriod)
         {
-            Debug.Log("[AbilityManager] Hit absorbed during grace period!");
             return true;
         }
 
@@ -152,14 +152,29 @@ public class AbilityManager : MonoBehaviour
     private IEnumerator SpeedBoostRoutine()
     {
         IsSpeedBoostActive = true;
-        SetIndicatorActive(speedIndicator, true);
+        SpeedRemaining = speedBoostDuration;
 
         if (pacStudent != null)
         {
             pacStudent.speedMultiplier = speedMultiplierValue;
         }
 
-        yield return new WaitForSeconds(speedBoostDuration);
+        while (SpeedRemaining > 0)
+        {
+            // Hiệu ứng nhấp nháy khi còn dưới 1 giây (chớp khoảng 6 lần/giây)
+            if (SpeedRemaining <= 1.0f)
+            {
+                bool show = Mathf.FloorToInt(SpeedRemaining * 6f) % 2 == 0;
+                SetIndicatorActive(speedIndicator, show);
+            }
+            else
+            {
+                SetIndicatorActive(speedIndicator, true);
+            }
+
+            SpeedRemaining -= Time.deltaTime;
+            yield return null;
+        }
 
         if (pacStudent != null)
         {
@@ -168,6 +183,7 @@ public class AbilityManager : MonoBehaviour
 
         SetIndicatorActive(speedIndicator, false);
         IsSpeedBoostActive = false;
+        SpeedRemaining = 0f;
         speedBoostRoutine = null;
     }
 
@@ -184,12 +200,26 @@ public class AbilityManager : MonoBehaviour
     private IEnumerator FreezeRoutine()
     {
         IsFreezeActive = true;
+        FreezeRemaining = freezeDuration;
         SetAllGhostsFrozen(true);
 
-        yield return new WaitForSeconds(freezeDuration);
+        while (FreezeRemaining > 0)
+        {
+            bool showIndicator = true;
+            if (FreezeRemaining <= 1.0f)
+            {
+                showIndicator = Mathf.FloorToInt(FreezeRemaining * 6f) % 2 == 0;
+            }
+
+            UpdateGhostsFreezeIndicator(showIndicator);
+
+            FreezeRemaining -= Time.deltaTime;
+            yield return null;
+        }
 
         SetAllGhostsFrozen(false);
         IsFreezeActive = false;
+        FreezeRemaining = 0f;
         freezeRoutine = null;
     }
 
@@ -206,6 +236,19 @@ public class AbilityManager : MonoBehaviour
                     continue;
                 }
                 ghost.SetFrozen(freeze);
+            }
+        }
+    }
+
+    private void UpdateGhostsFreezeIndicator(bool visible)
+    {
+        if (GameManager.Instance == null || GameManager.Instance.ghosts == null) return;
+
+        foreach (GhostController ghost in GameManager.Instance.ghosts)
+        {
+            if (ghost != null)
+            {
+                ghost.SetFreezeIndicatorVisible(visible);
             }
         }
     }
@@ -281,6 +324,8 @@ public class AbilityManager : MonoBehaviour
         IsFreezeActive = false;
         IsShieldActive = false;
         IsInGracePeriod = false;
+        SpeedRemaining = 0f;
+        FreezeRemaining = 0f;
         CurrentAbility = AbilityType.None;
         UpdateSlotUI();
     }

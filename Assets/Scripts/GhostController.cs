@@ -455,4 +455,11 @@ public class GhostController : MonoBehaviour
         animator.Play(stateName);
         currentAnimName = stateName;
     }
+    public void SetFreezeIndicatorVisible(bool visible)
+    {
+        if (freezeIndicator != null)
+        {
+            freezeIndicator.SetActive(visible && IsFrozen);
+        }
+    }
 }
