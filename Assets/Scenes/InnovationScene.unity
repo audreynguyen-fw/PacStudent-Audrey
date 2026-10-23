@@ -27998,7 +27998,8 @@ MonoBehaviour:
   deadMusic: {fileID: 8300000, guid: 66b745e05264a1a44a10ea9bc55de3c2, type: 3}
   scaredDuration: 10
   recoverTime: 3
-  saveHighScore: 0
+  saveHighScore: 1
+  useLevel2HighScore: 1
 --- !u!4 &999506398
 Transform:
   m_ObjectHideFlags: 0

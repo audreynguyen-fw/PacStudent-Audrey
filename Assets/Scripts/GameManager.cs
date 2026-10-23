@@ -18,6 +18,8 @@ public class GameManager : MonoBehaviour
 
     public const string HighScoreKey = "HighScore";
     public const string HighScoreTimeKey = "HighScoreTime";
+    public const string HighScoreKeyLevel2 = "HighScore_L2";
+    public const string HighScoreTimeKeyLevel2 = "HighScoreTime_L2";
 
     [Header("UI Reference")]
     public UIManager uiManager;
@@ -57,6 +59,7 @@ public class GameManager : MonoBehaviour
 
     [Header("High Score Settings")]
     [SerializeField] private bool saveHighScore = true;
+    [SerializeField] private bool useLevel2HighScore = false;
 
     [Header("Game State")]
     public GameState currentState { get; private set; } = GameState.Countdown;
@@ -527,16 +530,19 @@ public class GameManager : MonoBehaviour
     {
         if (!saveHighScore) return;
 
+        string scoreKey = useLevel2HighScore ? HighScoreKeyLevel2 : HighScoreKey;
+        string timeKey = useLevel2HighScore ? HighScoreTimeKeyLevel2 : HighScoreTimeKey;
+
         bool isNewRecord = false;
 
-        if (!PlayerPrefs.HasKey(HighScoreKey))
+        if (!PlayerPrefs.HasKey(scoreKey))
         {
             isNewRecord = true;
         }
         else
         {
-            int oldScore = PlayerPrefs.GetInt(HighScoreKey, 0);
-            float oldTime = PlayerPrefs.GetFloat(HighScoreTimeKey, 0f);
+            int oldScore = PlayerPrefs.GetInt(scoreKey, 0);
+            float oldTime = PlayerPrefs.GetFloat(timeKey, 0f);
 
             if (currentScore > oldScore)
             {
@@ -550,10 +556,10 @@ public class GameManager : MonoBehaviour
 
         if (isNewRecord)
         {
-            PlayerPrefs.SetInt(HighScoreKey, currentScore);
-            PlayerPrefs.SetFloat(HighScoreTimeKey, gameTimer);
+            PlayerPrefs.SetInt(scoreKey, currentScore);
+            PlayerPrefs.SetFloat(timeKey, gameTimer);
             PlayerPrefs.Save();
-            Debug.Log($"New High Score Saved: {currentScore} in {gameTimer}s");
+            Debug.Log($"New High Score Saved (Level {(useLevel2HighScore ? 2 : 1)}): {currentScore} in {gameTimer}s");
         }
     }
 
