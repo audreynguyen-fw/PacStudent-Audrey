@@ -42,6 +42,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Collectible Sounds")]
     public AudioClip cherrySound;
+    public AudioClip powerPelletSound;
 
     [Header("Audio Settings")]
     public AudioSource bgmAudioSource;
@@ -222,6 +223,11 @@ public class GameManager : MonoBehaviour
 
         AddScore(ScorePowerPellet);
         totalPelletsRemaining--;
+
+        if (sfxAudioSource != null && powerPelletSound != null)
+        {
+            sfxAudioSource.PlayOneShot(powerPelletSound);
+        }
 
         TriggerScaredState();
         CheckLevelComplete();
