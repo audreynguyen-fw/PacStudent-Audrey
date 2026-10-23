@@ -52,7 +52,6 @@ public class LevelGenerator : MonoBehaviour
     void GenerateFullLevel()
     {
         GameObject rootLevel = new GameObject("Generated_Level");
-
         Transform qTopLeft = CreateQuadrantContainer("Generated_TopLeft", new Vector3(0, 0, 0), rootLevel.transform);
         Transform qTopRight = CreateQuadrantContainer("Generated_TopRight", new Vector3(cols * 2 - 1, 0, 0), rootLevel.transform);
         Transform qBottomLeft = CreateQuadrantContainer("Generated_BottomLeft", new Vector3(0, -(rows - 1) * 2, 0), rootLevel.transform);
@@ -326,8 +325,7 @@ public class LevelGenerator : MonoBehaviour
     {
         int x = Mathf.RoundToInt(worldPos.x);
         int y = Mathf.RoundToInt(worldPos.y);
-
-        // Chặn Ghost đi vào 2 ô cổng dịch chuyển ở 2 mép bản đồ
+        
         if (y == -14 && (x == 0 || x == 27))
         {
             return false;

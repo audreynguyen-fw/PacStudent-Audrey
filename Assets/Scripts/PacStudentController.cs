@@ -93,9 +93,8 @@ public class PacStudentController : MonoBehaviour
             animator.ResetTrigger("MoveLeft");
             animator.ResetTrigger("MoveRight");
             animator.ResetTrigger("Die");
-
             animator.Play("PacStudent_Walk_Right");
-            animator.Update(0f); // Force Animator cập nhật ngay khung hình xuất phát
+            animator.Update(0f);
             animator.speed = 0f;
         }
 

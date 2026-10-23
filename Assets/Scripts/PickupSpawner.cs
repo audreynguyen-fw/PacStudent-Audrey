@@ -56,12 +56,8 @@ public class PickupSpawner : MonoBehaviour
     private void TrySpawnOrb()
     {
         if (orbPrefabs == null || orbPrefabs.Length == 0 || pacStudent == null) return;
-
-        // 1. Chọn ngẫu nhiên 1 prefab trong mảng 3 prefabs
         GameObject selectedPrefab = orbPrefabs[Random.Range(0, orbPrefabs.Length)];
         if (selectedPrefab == null) return;
-
-        // 2. Tìm tất cả Pellet hợp lệ
         GameObject[] pellets = GameObject.FindGameObjectsWithTag("Pellet");
         if (pellets.Length == 0) return;
 
@@ -81,12 +77,8 @@ public class PickupSpawner : MonoBehaviour
         }
 
         if (candidatePellets.Count == 0) return;
-
-        // 3. Chọn ngẫu nhiên vị trí ô Pellet đủ khoảng cách
         GameObject chosenPellet = candidatePellets[Random.Range(0, candidatePellets.Count)];
         Vector3 spawnPos = chosenPellet.transform.position;
-
-        // 4. Instantiate prefab orb được chọn (không cần SetType nữa vì prefab đã có sẵn abilityType)
         GameObject newOrb = Instantiate(selectedPrefab, spawnPos, Quaternion.identity);
 
         Destroy(newOrb, orbLifetime);

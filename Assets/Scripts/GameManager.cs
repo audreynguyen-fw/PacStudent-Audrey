@@ -207,7 +207,6 @@ public class GameManager : MonoBehaviour
     public void SetTotalPellets(int count)
     {
         totalPelletsRemaining = count;
-        Debug.Log("Total Pellets Registered: " + totalPelletsRemaining);
     }
 
     public void OnPelletEaten()
@@ -559,7 +558,6 @@ public class GameManager : MonoBehaviour
             PlayerPrefs.SetInt(scoreKey, currentScore);
             PlayerPrefs.SetFloat(timeKey, gameTimer);
             PlayerPrefs.Save();
-            Debug.Log($"New High Score Saved (Level {(useLevel2HighScore ? 2 : 1)}): {currentScore} in {gameTimer}s");
         }
     }
 

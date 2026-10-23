@@ -233,7 +233,6 @@ public class GhostController : MonoBehaviour
 
         bool isScaredOrRecovering = (CurrentState == GhostState.Scared || CurrentState == GhostState.Recovering);
 
-        // Logic bám vòng cố định cho Ghost 4 khi ở trạng thái Normal
         if (ghostId == 4 && !isScaredOrRecovering)
         {
             Vector2Int currentGridPos = new Vector2Int(Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.y));
