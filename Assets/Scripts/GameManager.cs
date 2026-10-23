@@ -259,7 +259,7 @@ public class GameManager : MonoBehaviour
             case GhostState.Normal:
                 if (AbilityManager.Instance != null && AbilityManager.Instance.TryAbsorbHit())
                 {
-                    break; // Chặn mất mạng nếu khiên hoạt động hoặc đang trong thời gian bất tử ngắn
+                    break;
                 }
 
                 StartCoroutine(PacStudentDeathSequence());
@@ -441,6 +441,11 @@ public class GameManager : MonoBehaviour
         }
         else
         {
+            if (AbilityManager.Instance != null)
+            {
+                AbilityManager.Instance.ResetAllAbilities();
+            }
+
             if (pacStudent != null) pacStudent.ResetToStart();
 
             ResetGhostsToStart();
