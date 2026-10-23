@@ -18,6 +18,14 @@ public class AbilityManager : MonoBehaviour
     public GameObject shieldIndicator;
     public GameObject speedIndicator;
 
+    [Header("Audio")]
+    public AudioSource sfxSource;
+    public AudioClip sfxPickup;
+    public AudioClip sfxSpeed;
+    public AudioClip sfxFreeze;
+    public AudioClip sfxShieldOn;
+    public AudioClip sfxShieldBreak;
+
     [Header("Ability Settings")]
     public PacStudentController pacStudent;
     [SerializeField] private float speedBoostDuration = 4.0f;
@@ -78,6 +86,7 @@ public class AbilityManager : MonoBehaviour
     public void CollectAbility(AbilityType type)
     {
         CurrentAbility = type;
+        PlaySfx(sfxPickup);
         UpdateSlotUI();
     }
 
@@ -90,15 +99,18 @@ public class AbilityManager : MonoBehaviour
         switch (usedAbility)
         {
             case AbilityType.SpeedBoost:
+                PlaySfx(sfxSpeed);
                 TriggerSpeedBoost();
                 break;
 
             case AbilityType.Freeze:
+                PlaySfx(sfxFreeze);
                 TriggerFreeze();
                 break;
 
             case AbilityType.Shield:
                 IsShieldActive = true;
+                PlaySfx(sfxShieldOn);
                 SetIndicatorActive(shieldIndicator, true);
                 break;
         }
@@ -109,6 +121,7 @@ public class AbilityManager : MonoBehaviour
         if (IsShieldActive)
         {
             IsShieldActive = false;
+            PlaySfx(sfxShieldBreak);
             SetIndicatorActive(shieldIndicator, false);
             StartGracePeriod();
             return true;
@@ -161,7 +174,6 @@ public class AbilityManager : MonoBehaviour
 
         while (SpeedRemaining > 0)
         {
-            // Hiệu ứng nhấp nháy khi còn dưới 1 giây (chớp khoảng 6 lần/giây)
             if (SpeedRemaining <= 1.0f)
             {
                 bool show = Mathf.FloorToInt(SpeedRemaining * 6f) % 2 == 0;
@@ -250,6 +262,14 @@ public class AbilityManager : MonoBehaviour
             {
                 ghost.SetFreezeIndicatorVisible(visible);
             }
+        }
+    }
+
+    private void PlaySfx(AudioClip clip)
+    {
+        if (sfxSource != null && clip != null)
+        {
+            sfxSource.PlayOneShot(clip);
         }
     }
 

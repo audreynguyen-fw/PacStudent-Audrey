@@ -28715,6 +28715,12 @@ MonoBehaviour:
   shieldSprite: {fileID: -6717884257390833292, guid: bb7534aaadf89d34395ca8679d33d9c0, type: 3}
   shieldIndicator: {fileID: 383003204}
   speedIndicator: {fileID: 1772578708}
+  sfxSource: {fileID: 2034509100}
+  sfxPickup: {fileID: 8300000, guid: ac24c29947f09e7448184f71c92f27d8, type: 3}
+  sfxSpeed: {fileID: 8300000, guid: 30892ad12a8e5cb48ae1d22866b75252, type: 3}
+  sfxFreeze: {fileID: 8300000, guid: 22807d671235f7c4d98dfac8c4ba77bf, type: 3}
+  sfxShieldOn: {fileID: 8300000, guid: 5514cdf7f7f6e5846b7a55d7e24fd712, type: 3}
+  sfxShieldBreak: {fileID: 8300000, guid: e923720fd0c45a542b8c6c8229ef25cf, type: 3}
   pacStudent: {fileID: 911720577}
   speedBoostDuration: 4
   speedMultiplierValue: 1.6
