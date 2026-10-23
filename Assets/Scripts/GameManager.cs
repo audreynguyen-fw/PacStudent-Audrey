@@ -257,6 +257,11 @@ public class GameManager : MonoBehaviour
         switch (gc.CurrentState)
         {
             case GhostState.Normal:
+                if (AbilityManager.Instance != null && AbilityManager.Instance.TryAbsorbHit())
+                {
+                    break; // Chặn mất mạng nếu khiên hoạt động hoặc đang trong thời gian bất tử ngắn
+                }
+
                 StartCoroutine(PacStudentDeathSequence());
                 break;
 

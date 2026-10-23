@@ -19,13 +19,17 @@ public class AbilityManager : MonoBehaviour
     [SerializeField] private float speedBoostDuration = 4.0f;
     [SerializeField] private float speedMultiplierValue = 1.6f;
     [SerializeField] private float freezeDuration = 4.0f;
+    [SerializeField] private float shieldGraceDuration = 1.0f;
 
     public AbilityType CurrentAbility { get; private set; } = AbilityType.None;
     public bool IsSpeedBoostActive { get; private set; } = false;
     public bool IsFreezeActive { get; private set; } = false;
+    public bool IsShieldActive { get; private set; } = false;
+    public bool IsInGracePeriod { get; private set; } = false;
 
     private Coroutine speedBoostRoutine;
     private Coroutine freezeRoutine;
+    private Coroutine gracePeriodRoutine;
 
     private void Awake()
     {
@@ -84,9 +88,46 @@ public class AbilityManager : MonoBehaviour
                 break;
 
             case AbilityType.Shield:
-                Debug.Log("[AbilityManager] Used Shield (Logic in 4c)");
+                IsShieldActive = true;
+                Debug.Log("[AbilityManager] Shield activated!");
                 break;
         }
+    }
+
+    public bool TryAbsorbHit()
+    {
+        if (IsShieldActive)
+        {
+            IsShieldActive = false;
+            StartGracePeriod();
+            Debug.Log("[AbilityManager] Shield absorbed a hit!");
+            return true;
+        }
+
+        if (IsInGracePeriod)
+        {
+            Debug.Log("[AbilityManager] Hit absorbed during grace period!");
+            return true;
+        }
+
+        return false;
+    }
+
+    private void StartGracePeriod()
+    {
+        if (gracePeriodRoutine != null)
+        {
+            StopCoroutine(gracePeriodRoutine);
+        }
+        gracePeriodRoutine = StartCoroutine(GracePeriodRoutine());
+    }
+
+    private IEnumerator GracePeriodRoutine()
+    {
+        IsInGracePeriod = true;
+        yield return new WaitForSeconds(shieldGraceDuration);
+        IsInGracePeriod = false;
+        gracePeriodRoutine = null;
     }
 
     private void TriggerSpeedBoost()
@@ -201,6 +242,12 @@ public class AbilityManager : MonoBehaviour
             freezeRoutine = null;
         }
 
+        if (gracePeriodRoutine != null)
+        {
+            StopCoroutine(gracePeriodRoutine);
+            gracePeriodRoutine = null;
+        }
+
         if (pacStudent != null)
         {
             pacStudent.speedMultiplier = 1.0f;
@@ -210,6 +257,8 @@ public class AbilityManager : MonoBehaviour
 
         IsSpeedBoostActive = false;
         IsFreezeActive = false;
+        IsShieldActive = false;
+        IsInGracePeriod = false;
         CurrentAbility = AbilityType.None;
         UpdateSlotUI();
     }
