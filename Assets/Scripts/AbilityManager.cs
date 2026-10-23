@@ -14,6 +14,10 @@ public class AbilityManager : MonoBehaviour
     public Sprite freezeSprite;
     public Sprite shieldSprite;
 
+    [Header("Visual Indicators")]
+    public GameObject shieldIndicator;
+    public GameObject speedIndicator;
+
     [Header("Ability Settings")]
     public PacStudentController pacStudent;
     [SerializeField] private float speedBoostDuration = 4.0f;
@@ -48,6 +52,9 @@ public class AbilityManager : MonoBehaviour
         {
             pacStudent = Object.FindFirstObjectByType<PacStudentController>();
         }
+
+        SetIndicatorActive(shieldIndicator, false);
+        SetIndicatorActive(speedIndicator, false);
 
         UpdateSlotUI();
     }
@@ -89,6 +96,7 @@ public class AbilityManager : MonoBehaviour
 
             case AbilityType.Shield:
                 IsShieldActive = true;
+                SetIndicatorActive(shieldIndicator, true);
                 Debug.Log("[AbilityManager] Shield activated!");
                 break;
         }
@@ -99,6 +107,7 @@ public class AbilityManager : MonoBehaviour
         if (IsShieldActive)
         {
             IsShieldActive = false;
+            SetIndicatorActive(shieldIndicator, false);
             StartGracePeriod();
             Debug.Log("[AbilityManager] Shield absorbed a hit!");
             return true;
@@ -143,6 +152,7 @@ public class AbilityManager : MonoBehaviour
     private IEnumerator SpeedBoostRoutine()
     {
         IsSpeedBoostActive = true;
+        SetIndicatorActive(speedIndicator, true);
 
         if (pacStudent != null)
         {
@@ -156,6 +166,7 @@ public class AbilityManager : MonoBehaviour
             pacStudent.speedMultiplier = 1.0f;
         }
 
+        SetIndicatorActive(speedIndicator, false);
         IsSpeedBoostActive = false;
         speedBoostRoutine = null;
     }
@@ -196,6 +207,14 @@ public class AbilityManager : MonoBehaviour
                 }
                 ghost.SetFrozen(freeze);
             }
+        }
+    }
+
+    private void SetIndicatorActive(GameObject indicator, bool active)
+    {
+        if (indicator != null)
+        {
+            indicator.SetActive(active);
         }
     }
 
@@ -254,6 +273,9 @@ public class AbilityManager : MonoBehaviour
         }
 
         SetAllGhostsFrozen(false);
+
+        SetIndicatorActive(shieldIndicator, false);
+        SetIndicatorActive(speedIndicator, false);
 
         IsSpeedBoostActive = false;
         IsFreezeActive = false;
